@@ -4,107 +4,17 @@
     <meta charset="UTF-8">
     <title>{{ title }}</title>
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f4f6f8;
-            margin: 0;
-            padding: 0;
-        }
+    <!-- Link Style File -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
-        .container {
-            width: 80%;
-            margin: 40px auto;
-            background: #ffffff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-
-        h1 {
-            text-align: center;
-            margin-bottom: 30px;
-            color: #2c3e50;
-        }
-
-        form {
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-
-        input[type="file"] {
-            padding: 8px;
-        }
-
-        select {
-            padding: 8px;
-            min-width: 200px;
-        }
-
-        button {
-            padding: 10px 18px;
-            background: #25D366;
-            border: none;
-            color: white;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 15px;
-        }
-
-        button:hover {
-            background: #1da851;
-        }
-
-        .stats {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-top: 30px;
-        }
-
-        .card {
-            background: #ecf0f1;
-            padding: 20px;
-            flex: 0 1 calc(25% - 15px); /* Adjusts card dimensions to fit side-by-side */
-            margin: 5px;
-            border-radius: 6px;
-            text-align: center;
-        }
-
-        .card h2 {
-            margin: 0;
-            color: #2c3e50;
-            font-size: 22px;
-        }
-
-        .card p {
-            font-size: 14px;
-            color: #555;
-        }
-
-        .charts {
-            margin-top: 40px;
-            text-align: center;
-        }
-
-        .charts img {
-            max-width: 90%;
-            margin: 20px 0;
-            border-radius: 6px;
-        }
-    </style>
+    <!-- Include Chart.js Library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-
 <body>
 <div class="container">
     <h1>WhatsApp Chat Analysis</h1>
 
-    <!-- Upload + Filter Form -->
+    <!-- Form -->
     <form id="uploadForm">
         <input type="file" id="chat_file" name="chat_file" required>
 
@@ -131,68 +41,21 @@
             <h2 id="num_medias"></h2>
             <p>Total Media Shared</p>
         </div>
-        
+
         <div class="card">
             <h2 id="num_links"></h2>
             <p>Total Links Shared</p>
         </div>
     </div>
 
-    <!-- Charts -->
+    <!-- Chart -->
+    <div class="charts">
+        <canvas id="analysisChart"></canvas>
+    </div>
 </div>
 
-<script>
-    document.getElementById('uploadForm').addEventListener('change', async (event) => {
-        if (event.target.id === 'chat_file') {
-            const formData = new FormData();
-            formData.append('chat_file', event.target.files[0]);
-
-            const response = await fetch('/', {
-                method: 'POST',
-                body: formData
-            });
-
-            const data = await response.json();
-            const userDropdown = document.getElementById('user_dropdown');
-            userDropdown.innerHTML = '<option disabled selected value="">Select a User</option>';
-
-            data.user_list.forEach(user => {
-                const option = document.createElement('option');
-                option.value = user;
-                option.textContent = user;
-                userDropdown.appendChild(option);
-            });
-        }
-    });
-
-    document.getElementById('analyze').addEventListener('click', async () => {
-        const selectedUser = document.getElementById('user_dropdown').value;
-        const chatFileName = document.getElementById('chat_file').files[0].name;
-
-        const response = await fetch('/fetch_stats', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                selected_user: selectedUser,
-                file_name: chatFileName
-            })
-        });
-
-        const data = await response.json();
-        const stats = document.getElementById('stats');
-        const numMessages = document.getElementById('num_messages');
-        const numWords = document.getElementById('num_words');
-        const numMedias= document.getElementById('num_medias');
-        const numLinks= document.getElementById('num_links')
-
-        stats.style.display = 'flex';
-        numMessages.textContent = data.results.num_messages;
-        numWords.textContent = data.results.num_words;
-        numMedias.textContent = data.results.num_medias;
-        numLinks.textContent= data.results.num_links;
-    });
-</script>
+<!-- Include JavaScript Files -->
+<script src="{{ url_for('static', filename='script/script.js') }}"></script>
+<script src="{{ url_for('static', filename='script/chart.js') }}"></script>
 </body>
 </html>

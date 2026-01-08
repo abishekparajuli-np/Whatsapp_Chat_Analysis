@@ -1,4 +1,5 @@
 from urlextract import URLExtract
+import pandas as pd
 extractor=URLExtract()
 
 
@@ -30,3 +31,9 @@ def num_links(df):
     for message in df['Message']:
         links.extend(extractor.find_urls(message))
     return len(links)
+
+def busiest_user(df):
+    busiest_user=df['Message'].value_counts().head().index
+    count=df['Mesaage'].value_counts().head().values
+
+    return

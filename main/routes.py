@@ -3,7 +3,7 @@ from main.preprocessor import preprocess
 import os
 import pandas as pd
 from main import app
-from main.helper import fetch_stats
+from main.helper import fetch_stats,busiest_user
 
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -12,7 +12,6 @@ app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 @app.route('/', methods=['GET', 'POST'])
 def main():
     user_list = []
-    num_messages = num_words = num_medias=num_links= None
     results = None
 
     if request.method == 'POST':
@@ -47,6 +46,7 @@ def main():
 
 @app.route('/fetch_stats', methods=['POST'])
 def fetch():
+    num_messages = num_words = num_medias=num_links= None
     selected_user = request.json.get('selected_user')
     chat_file_name = request.json.get('file_name')
 
@@ -59,6 +59,10 @@ def fetch():
         data = f.read()
 
     df = preprocess(data)
+    if selected_user == 'Overall':
+       top_busiest_user= busiest_user(df)
+
+
     num_messages, num_words, num_medias, num_links= fetch_stats(selected_user, df)
     results = {
         'num_messages': num_messages,
