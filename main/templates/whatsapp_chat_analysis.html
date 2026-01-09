@@ -4,17 +4,15 @@
     <meta charset="UTF-8">
     <title>{{ title }}</title>
 
-    <!-- Link Style File -->
+
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
-    <!-- Include Chart.js Library -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 <div class="container">
     <h1>WhatsApp Chat Analysis</h1>
 
-    <!-- Form -->
     <form id="uploadForm">
         <input type="file" id="chat_file" name="chat_file" required>
 
@@ -25,7 +23,6 @@
         <button type="button" id="analyze">Analyze</button>
     </form>
 
-    <!-- Stats Section -->
     <div id="stats" class="stats" style="display: none;">
         <div class="card">
             <h2 id="num_messages"></h2>
