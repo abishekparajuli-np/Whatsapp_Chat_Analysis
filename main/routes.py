@@ -1,73 +1,83 @@
-from flask import Flask, render_template, request, jsonify
+from flask import render_template, request, jsonify
 from main.preprocessor import preprocess
 import os
-import pandas as pd
 from main import app
-from main.helper import fetch_stats,busiest_user
+from main.helper import fetch_stats, busiest_user
 
+# Configuration
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
 @app.route('/', methods=['GET', 'POST'])
 def main():
-    user_list = []
-    results = None
-
     if request.method == 'POST':
         chat_file = request.files.get('chat_file')
 
-        if chat_file and chat_file.filename != "":
-            filepath = os.path.join(
-                app.config['UPLOAD_FOLDER'],
-                chat_file.filename
-            )
-            chat_file.save(filepath)
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], chat_file.filename)
+        chat_file.save(filepath)  # Save the uploaded file
 
-            with open(filepath, 'r', encoding='utf-8') as f:
-                data = f.read()
+        # Read the contents of the file
+        with open(filepath, 'r', encoding='utf-8') as f:
+            data = f.read()
 
-            df = preprocess(data)
+        # Preprocess the chat data
+        df = preprocess(data)
 
-            user_list = df['Users'].unique().tolist()
-            if 'group_notification' in user_list:
-                user_list.remove('group_notification')
+        # Extract unique user list
+        user_list = df['Users'].unique().tolist()
+        if 'group_notification' in user_list:
+            user_list.remove('group_notification')
 
-            user_list.sort()
-            user_list.insert(0, 'Overall')
+        user_list.sort()
+        user_list.insert(0, 'Overall')  # Add "Overall" as the first option
 
-            return jsonify({'user_list': user_list})
+        return jsonify({'user_list': user_list})
 
+    # Render the main page
     return render_template(
         'whatsapp_chat_analysis.html',
         title='Whatsapp Chat Analysis',
         user_list=[]
     )
 
+
 @app.route('/fetch_stats', methods=['POST'])
 def fetch():
-    num_messages = num_words = num_medias=num_links= None
-    selected_user = request.json.get('selected_user')
-    chat_file_name = request.json.get('file_name')
+    data = request.json
+    selected_user = data.get('selected_user')
+    chat_file_name = data.get('file_name')
 
-    filepath = os.path.join(
-        app.config['UPLOAD_FOLDER'],
-        chat_file_name
-    )
+    # Construct file path
+    filepath = os.path.join(app.config['UPLOAD_FOLDER'], chat_file_name)
 
+    # Read the file
     with open(filepath, 'r', encoding='utf-8') as f:
-        data = f.read()
+        chat_data = f.read()
 
-    df = preprocess(data)
+    # Preprocess chat data
+    df = preprocess(chat_data)
+
+    # If selected_user is 'Overall', compute busiest user stats
     if selected_user == 'Overall':
-       top_busiest_user= busiest_user(df)
+        top_busiest_user_df = busiest_user(df)
+        top_users = top_busiest_user_df['User'].tolist()
+        message_share = top_busiest_user_df['Message_Share'].tolist()
+    else:
+        top_users = []
+        message_share = []
 
+    # Fetch stats for the selected user
+    num_messages, num_words, num_medias, num_links = fetch_stats(selected_user, df)
 
-    num_messages, num_words, num_medias, num_links= fetch_stats(selected_user, df)
+    # Prepare the results to send to the frontend
     results = {
         'num_messages': num_messages,
         'num_words': num_words,
-        'num_medias':num_medias,
-        'num_links':num_links,
+        'num_medias': num_medias,
+        'num_links': num_links,
+        'top_users': top_users,  # Empty for non-'Overall' users
+        'message_share': message_share,  # Empty for non-'Overall' users
     }
+
     return jsonify({'results': results})

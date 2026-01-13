@@ -80,13 +80,209 @@ button:hover {
     color: #555;
 }
 
+/* ===================== CHART LAYOUT ===================== */
 .charts {
+    display: flex;
+    gap: 30px;
+    align-items: center;
+    justify-content: space-between;
     margin-top: 40px;
+}
+
+/* Fixed chart size */
+.chart-box {
+    width: 60%;
+    max-width: 600px;
+    height: 350px;
+}
+
+/* Ensure canvas fits nicely */
+.chart-box canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+/* ===================== TABLE ===================== */
+.chart-table {
+    width: 35%;
+}
+
+.chart-table table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #f9f9f9;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.chart-table th,
+.chart-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.chart-table th {
+    background: #25D366;
+    color: white;
+    font-size: 14px;
+}
+
+.chart-table td {
+    font-size: 14px;
+    color: #333;
+}
+
+/* ===================== RESPONSIVE ===================== */
+@media (max-width: 900px) {
+    .charts {
+        flex-direction: column;
+    }
+
+    .chart-box,
+    .chart-table {
+        width: 100%;
+    }
+}
+body {
+    font-family: Arial, sans-serif;
+    padding: 40px;
+    background: #f4f6f8;
+}
+
+h2 {
     text-align: center;
 }
 
-.charts img {
-    max-width: 90%;
+table {
+    width: 50%;
+    margin: auto;
+    border-collapse: collapse;
+    background: #fff;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: center;
+}
+
+th {
+    background: #3175bd;
+    color: white;
+}
+
+tr:nth-child(even) {
+    background: #f2f2f2;
+}
+.chart-table-wrapper {
+    display: flex;
+    gap: 30px;
+    justify-content: center;
+    align-items: flex-start;
+    margin-top: 40px;
+}
+
+/* Pie chart container */
+.chart-box {
+    width: 50%;
+    min-width: 300px;
+}
+
+/* Table container */
+.table-box {
+    width: 40%;
+    min-width: 300px;
+}
+
+/* Make it responsive */
+@media (max-width: 900px) {
+    .chart-table-wrapper {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .chart-box,
+    .table-box {
+        width: 90%;
+    }
+}
+/* Scrollable table container */
+#table-container {
+    max-height: 350px;      /* adjust as needed */
+    overflow-y: auto;
+    overflow-x: hidden;
+    border-radius: 8px;
+}
+
+/* Keep header visible while scrolling (optional but recommended) */
+#dataTable thead th {
+    position: sticky;
+    top: 0;
+    background: #007bff;
+    color: white;
+    z-index: 2;
+}
+
+/* Table styling (if not already present) */
+#dataTable {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#dataTable th,
+#dataTable td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+#table-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+#table-container::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+/* Center the form */
+#uploadForm {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     margin: 20px 0;
-    border-radius: 6px;
+}
+
+/* Hide default file input button */
+#chat_file {
+    display: none; 
+}
+
+/* Custom file upload button */
+#uploadForm label {
+    display: inline-block;
+    background-color: #007bff;
+    color: white;
+    padding: 12px 25px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.3s;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Hover effect */
+#uploadForm label:hover {
+    background-color: #0056b3;
+}
+
+/* Optional: show selected file name */
+#fileName {
+    margin-left: 15px;
+    font-style: italic;
+    color: #333;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }

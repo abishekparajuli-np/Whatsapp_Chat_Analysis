@@ -1,5 +1,6 @@
 from urlextract import URLExtract
 import pandas as pd
+import numpy as np
 extractor=URLExtract()
 
 
@@ -33,7 +34,12 @@ def num_links(df):
     return len(links)
 
 def busiest_user(df):
-    busiest_user=df['Message'].value_counts().head().index
-    count=df['Mesaage'].value_counts().head().values
+    user_counts = df['Users'].value_counts().head(15)
+    message_share = np.round((user_counts / df.shape[0]) * 100,decimals=2)
 
-    return
+    r_df = pd.DataFrame({
+        'User': user_counts.index,
+        'Message_Share': message_share.values
+    })
+
+    return r_df
