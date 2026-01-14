@@ -2,7 +2,7 @@ from flask import render_template, request, jsonify
 from main.preprocessor import preprocess
 import os
 from main import app
-from main.helper import fetch_stats, busiest_user
+from main.helper import fetch_stats, busiest_user,word_cloud_words
 
 # Configuration
 UPLOAD_FOLDER = "uploads"
@@ -68,7 +68,7 @@ def fetch():
         message_share = []
 
     # Fetch stats for the selected user
-    num_messages, num_words, num_medias, num_links = fetch_stats(selected_user, df)
+    num_messages, num_words, num_medias, num_links,word_cloud = fetch_stats(selected_user, df)
 
     # Prepare the results to send to the frontend
     results = {
@@ -78,6 +78,7 @@ def fetch():
         'num_links': num_links,
         'top_users': top_users,  # Empty for non-'Overall' users
         'message_share': message_share,  # Empty for non-'Overall' users
+        'word_cloud':word_cloud
     }
 
     return jsonify({'results': results})

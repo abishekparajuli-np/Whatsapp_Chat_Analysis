@@ -1,6 +1,11 @@
 from urlextract import URLExtract
 import pandas as pd
 import numpy as np
+from collections import Counter
+import re
+import emoji
+from collections import Counter
+from wordcloud import STOPWORDS
 extractor=URLExtract()
 
 
@@ -11,8 +16,8 @@ def fetch_stats(selected_user,df):
     n_words=num_words(df)
     n_medias=num_medias(df)
     n_links=num_links(df)
-
-    return num_messages,n_words,n_medias,n_links
+    word_list=word_cloud_words(df)
+    return num_messages,n_words,n_medias,n_links,word_list
 
 
 
@@ -34,7 +39,7 @@ def num_links(df):
     return len(links)
 
 def busiest_user(df):
-    user_counts = df['Users'].value_counts().head(15)
+    user_counts = df['Users'].value_counts().head(30)
     message_share = np.round((user_counts / df.shape[0]) * 100,decimals=2)
 
     r_df = pd.DataFrame({
@@ -43,3 +48,49 @@ def busiest_user(df):
     })
 
     return r_df
+
+def word_cloud_words(msg_df):
+    NEPALI_STOPWORDS = {
+    "hai","nai","la","huss","hunxa","hola","haina","lai","xaina","tyo","pani","haru","chai","gara","tei"
+    }
+
+    SYSTEM_WORDS = {
+        "media", "omitted", "message", "deleted",
+        "joined", "left", "added", "removed",
+        "changed", "created", "group"
+    }
+
+    word_list = []
+    text = ""
+
+    for msg in msg_df["Message"]:
+        msg = str(msg).lower().strip()
+
+        if "media omitted" in msg:
+            continue
+
+        msg = re.sub(r"http\S+", "", msg)
+
+        msg = emoji.replace_emoji(msg, replace="")
+
+        msg = re.sub(r"[^a-zA-Z\u0900-\u097F\s]", "", msg)
+
+        text += msg + " "
+
+    words = text.split()
+
+    filtered_words = [
+        word for word in words
+        if (
+            word not in STOPWORDS and
+            word not in NEPALI_STOPWORDS and
+            word not in SYSTEM_WORDS and
+            len(word) > 2
+        )
+    ]
+
+    word_freq = Counter(filtered_words)
+    word_list = [[word, count] for word, count in word_freq.items()]
+    return word_list
+
+        

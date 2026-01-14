@@ -2,60 +2,63 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ title }}</title>
-
-
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-<div class="container">
-    <h1>WhatsApp Chat Analysis</h1>
+    <div class="container">
+        <h1>WhatsApp Chat Analysis</h1>
 
-<form id="uploadForm">
-    <label for="chat_file">Upload Chat File</label>
-    <input type="file" id="chat_file" name="chat_file" required>
-        <select id="user_dropdown" name="selected_user">
-            <option disabled selected value="">Select a User</option>
-        </select>
+        <form id="uploadForm">
+            <label for="chat_file">Upload Chat File</label>
+            <input type="file" id="chat_file" name="chat_file" required>
+            <select id="user_dropdown" name="selected_user">
+                <option disabled selected value="">Select a User</option>
+            </select>
+            <button type="button" id="analyze">Analyze</button>
+        </form>
 
-        <button type="button" id="analyze">Analyze</button>
-    </form>
-
-    <div id="stats" class="stats" style="display: none;">
-        <div class="card">
-            <h2 id="num_messages"></h2>
-            <p>Total Messages</p>
+        <div id="stats" class="stats" style="display: none;">
+            <div class="card">
+                <h2 id="num_messages">0</h2>
+                <p>Total Messages</p>
+            </div>
+            <div class="card">
+                <h2 id="num_words">0</h2>
+                <p>Total Words</p>
+            </div>
+            <div class="card">
+                <h2 id="num_medias">0</h2>
+                <p>Total Media Shared</p>
+            </div>
+            <div class="card">
+                <h2 id="num_links">0</h2>
+                <p>Total Links Shared</p>
+            </div>
         </div>
 
-        <div class="card">
-            <h2 id="num_words"></h2>
-            <p>Total Words</p>
+        <!-- Bar Chart -->
+        <div class="charts">
+            <canvas id="analysisChart"></canvas>
         </div>
 
-        <div class="card">
-            <h2 id="num_medias"></h2>
-            <p>Total Media Shared</p>
-        </div>
-
-        <div class="card">
-            <h2 id="num_links"></h2>
-            <p>Total Links Shared</p>
+        <!-- Pie Chart and Table Side by Side -->
+        <div class="chart-table-wrapper">
+            <div id="pieChartContainer" style="display: none;">
+                <canvas id="pieChart"></canvas>
+            </div>
+            <div class="table-box">
+                <div id="table-container"></div>
+            </div>
         </div>
     </div>
+<div class="word-cloud-container">
+    <canvas id="wordCloud"></canvas>
+</div>
 
-    <!-- Chart -->
-    <div class="charts">
-        <canvas id="analysisChart"></canvas>
-    </div>
-<div class="chart-table-wrapper">
-<div class="charts" id="pieChartContainer" style="display: none;">
-    <canvas id="pieChart"></canvas>
-</div>
-<div id="table-container"></div>
-</div>
-<script src="{{ url_for('static', filename='script/script.js') }}"></script>
-<script src="{{ url_for('static', filename='script/chart.js') }}"></script>
+    <script src="{{ url_for('static', filename='script/script.js') }}"></script>
+    <script src="{{ url_for('static', filename='script/chart.js') }}"></script>
 </body>
 </html>
