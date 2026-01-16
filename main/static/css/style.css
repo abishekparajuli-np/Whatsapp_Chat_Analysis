@@ -39,12 +39,10 @@ h1 {
     margin-bottom: 40px;
 }
 
-/* Hide default file input */
 #chat_file {
     display: none;
 }
 
-/* Custom upload button */
 #uploadForm label {
     background-color: #007bff;
     color: #fff;
@@ -149,7 +147,7 @@ button:hover {
     opacity: 0.95;
 }
 
-/* ===================== BAR CHART ===================== */
+/* ===================== CHARTS ===================== */
 .charts {
     width: 100%;
     margin: 40px 0;
@@ -175,22 +173,8 @@ button:hover {
     margin-bottom: 50px;
 }
 
-/* ===================== PIE CHART ===================== */
-#pieChartContainer {
-    flex: 1;
-    min-width: 400px;
-    background: #f9fafb;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-}
-
-#pieChart {
-    max-height: 400px;
-    width: 100% !important;
-}
-
-/* ===================== EMOJI PIE CHART ===================== */
+/* ===================== PIE CHARTS ===================== */
+#pieChartContainer,
 #EmojipieChartContainer {
     flex: 1;
     min-width: 400px;
@@ -200,26 +184,19 @@ button:hover {
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
 }
 
+#pieChart,
 #EmojipieChart {
     max-height: 400px;
     width: 100% !important;
 }
 
-/* ===================== TABLE ===================== */
+/* ===================== TABLES ===================== */
 .table-box {
     flex: 1;
     min-width: 400px;
 }
 
-/* Scrollable container for user table */
-#table-container {
-    max-height: 500px;
-    overflow-y: auto;
-    border-radius: 12px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-}
-
-/* Scrollable container for emoji table */
+#table-container,
 #emoji-table-container {
     max-height: 500px;
     overflow-y: auto;
@@ -227,7 +204,6 @@ button:hover {
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
 }
 
-/* Table styling - applies to both user and emoji tables */
 #dataTable,
 #emojiDataTable {
     width: 100%;
@@ -268,7 +244,6 @@ button:hover {
     transition: background-color 0.2s;
 }
 
-/* Scrollbar styling for both tables */
 #table-container::-webkit-scrollbar,
 #emoji-table-container::-webkit-scrollbar {
     width: 10px;
@@ -289,6 +264,26 @@ button:hover {
 #table-container::-webkit-scrollbar-thumb:hover,
 #emoji-table-container::-webkit-scrollbar-thumb:hover {
     background: #a8a8a8;
+}
+
+/* ===================== TIMELINE CHARTS ===================== */
+#timelineChartContainer {
+    width: 100%;
+    margin: 40px 0;
+}
+
+#timelineChartContainer > div {
+    background: #f9fafb;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    margin-bottom: 30px;
+}
+
+#timelineChartM,
+#timelineChartD {
+    height: 400px !important;
+    width: 100% !important;
 }
 
 /* ===================== WORD CLOUD ===================== */
@@ -366,6 +361,15 @@ button:hover {
     #pieChartContainer,
     #EmojipieChartContainer {
         padding: 20px;
+    }
+
+    #timelineChartContainer > div {
+        padding: 25px;
+    }
+
+    #timelineChartM,
+    #timelineChartD {
+        height: 300px !important;
     }
 }
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ title }}</title>
+    <title>WhatsApp Chat Analysis</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -11,6 +11,7 @@
     <div class="container">
         <h1>WhatsApp Chat Analysis</h1>
 
+        <!-- Upload Form -->
         <form id="uploadForm">
             <label for="chat_file">Upload Chat File</label>
             <input type="file" id="chat_file" name="chat_file" required>
@@ -20,6 +21,7 @@
             <button type="button" id="analyze">Analyze</button>
         </form>
 
+        <!-- Stats Cards -->
         <div id="stats" class="stats" style="display: none;">
             <div class="card">
                 <h2 id="num_messages">0</h2>
@@ -54,9 +56,16 @@
             </div>
         </div>
 
+        <!-- Timeline Charts -->
+<div id="timelineChartMContainer" style="display:none">
+    <canvas id="timelineChartM"></canvas>
+</div>
+
+<div id="timelineChartDContainer" style="display:none">
+    <canvas id="timelineChartD"></canvas>
+</div>
         <!-- Word Cloud -->
         <div class="word-cloud-container">
-            <h3>Most Frequently Used Words</h3>
             <canvas id="wordCloud"></canvas>
         </div>
 
@@ -70,12 +79,7 @@
             </div>
         </div>
     </div>
-            <div id="timelineChartContainer" style="display: none;">
-                <div>
-                <canvas id="timelineChartM"></canvas>
-                </div>
-            <div><canvas id="timelineChartD"></canvas></div>
-            </div>
+
     <script src="{{ url_for('static', filename='script/script.js') }}"></script>
     <script src="{{ url_for('static', filename='script/chart.js') }}"></script>
 </body>

@@ -3,7 +3,8 @@
 let analysisChart = null;
 let pieChart = null;
 let EmojipieChart = null;
-
+let timelineChartM = null;
+let timelineChartD = null;
 /**
  * Safely destroys and clears the data table
  */
@@ -791,7 +792,6 @@ function renderWordCloud(data) {
         console.error("❌ Word Cloud Error:", err);
     }
 }
-let timelineChart = null;
 
 /**
  * Renders a line chart showing message count per month
@@ -816,13 +816,13 @@ function renderLineChartM(data) {
         }
 
         // Show timeline chart container
-        const timelineContainer = document.getElementById("timelineChartContainer");
-        if (timelineContainer) {
-            timelineContainer.style.display = "block";
+        const timelineMContainer = document.getElementById("timelineChartMContainer");
+        if (timelineMContainer) {
+            timelineMContainer.style.display = "block";
         }
 
         // Destroy previous chart instance
-        timelineChart = destroyChart(timelineChart);
+        timelineChartM = destroyChart(timelineChartM);
 
 
 
@@ -961,7 +961,7 @@ function renderLineChartM(data) {
             }
         };
 
-        timelineChart = new Chart(ctx, {
+        timelineChartM = new Chart(ctx, {
             type: "line",
             data: chartData,
             options: chartOptions
@@ -996,13 +996,13 @@ function renderLineChartD(data) {
         }
 
         // Show timeline chart container
-        const timelineContainer = document.getElementById("timelineChartContainer");
-        if (timelineContainer) {
-            timelineContainer.style.display = "block";
+        const timelineDContainer = document.getElementById("timelineChartDContainer");
+        if (timelineDContainer) {
+            timelineDContainer.style.display = "block";
         }
 
         // Destroy previous chart instance
-        timelineChart = destroyChart(timelineChart);
+        timelineChartD = destroyChart(timelineChartD);
 
 
 
@@ -1141,7 +1141,7 @@ function renderLineChartD(data) {
             }
         };
 
-        timelineChart = new Chart(ctx, {
+        timelineChartD = new Chart(ctx, {
             type: "line",
             data: chartData,
             options: chartOptions
@@ -1181,7 +1181,8 @@ function clearAllVisualizations() {
     analysisChart = destroyChart(analysisChart);
     pieChart = destroyChart(pieChart);
     EmojipieChart = destroyChart(EmojipieChart);
-    timelineChart=destroyChart(timelineChart);
+    timelineChartM=destroyChart(timelineChartM);
+    timelineChartD=destroyChart(timelineChartD);
     destroyTable();
     destroyEmojiTable();
     
@@ -1194,9 +1195,13 @@ function clearAllVisualizations() {
     if (EmojipieContainer) {
         EmojipieContainer.style.display = "none";
     }
-        const timelineContainer = document.getElementById("timelineChartContainer");
-    if (timelineContainer) {
-        timelineContainer.style.display = "none";
+        const timelineMContainer = document.getElementById("timelineChartMContainer");
+    if (timelineMContainer) {
+        timelineMContainer.style.display = "none";
+    const timelineDContainer = document.getElementById("timelineChartDContainer");
+    if (timelineDContainer) {
+        timelineDContainer.style.display = "none";
     }
     console.log("✅ All visualizations cleared");
+}
 }
