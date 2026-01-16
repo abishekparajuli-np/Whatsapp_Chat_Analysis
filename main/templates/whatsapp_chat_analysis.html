@@ -44,7 +44,7 @@
             <canvas id="analysisChart"></canvas>
         </div>
 
-        <!-- Pie Chart and Table Side by Side -->
+        <!-- User Pie Chart and Table Side by Side -->
         <div class="chart-table-wrapper">
             <div id="pieChartContainer" style="display: none;">
                 <canvas id="pieChart"></canvas>
@@ -53,11 +53,29 @@
                 <div id="table-container"></div>
             </div>
         </div>
-    </div>
-<div class="word-cloud-container">
-    <canvas id="wordCloud"></canvas>
-</div>
 
+        <!-- Word Cloud -->
+        <div class="word-cloud-container">
+            <h3>Most Frequently Used Words</h3>
+            <canvas id="wordCloud"></canvas>
+        </div>
+
+        <!-- Emoji Pie Chart and Table Side by Side -->
+        <div class="chart-table-wrapper">
+            <div id="EmojipieChartContainer" style="display: none;">
+                <canvas id="EmojipieChart"></canvas>
+            </div>
+            <div class="table-box">
+                <div id="emoji-table-container"></div>
+            </div>
+        </div>
+    </div>
+            <div id="timelineChartContainer" style="display: none;">
+                <div>
+                <canvas id="timelineChartM"></canvas>
+                </div>
+            <div><canvas id="timelineChartD"></canvas></div>
+            </div>
     <script src="{{ url_for('static', filename='script/script.js') }}"></script>
     <script src="{{ url_for('static', filename='script/chart.js') }}"></script>
 </body>

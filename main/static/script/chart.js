@@ -1,13 +1,25 @@
-// chart.js - Enhanced version with better error handling and styling
+// chart.js - Enhanced version with titles and emoji table
 
 let analysisChart = null;
 let pieChart = null;
+let EmojipieChart = null;
 
 /**
  * Safely destroys and clears the data table
  */
 function destroyTable() {
     const container = document.getElementById("table-container");
+    if (container) {
+        container.innerHTML = "";
+        container.style.display = "none";
+    }
+}
+
+/**
+ * Safely destroys and clears the emoji table
+ */
+function destroyEmojiTable() {
+    const container = document.getElementById("emoji-table-container");
     if (container) {
         container.innerHTML = "";
         container.style.display = "none";
@@ -72,6 +84,19 @@ function renderBarChart(data) {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
+                title: {
+                    display: true,
+                    text: 'Chat Overview Statistics',
+                    font: {
+                        size: 20,
+                        weight: 'bold'
+                    },
+                    padding: {
+                        top: 10,
+                        bottom: 30
+                    },
+                    color: '#2c3e50'
+                },
                 legend: {
                     display: true,
                     position: 'top',
@@ -143,7 +168,7 @@ function renderBarChart(data) {
     }
 }
 
-/* ===================== PIE CHART ===================== */
+/* ===================== USER PIE CHART ===================== */
 /**
  * Renders a pie chart showing top 5 users by message share
  * @param {Object} data - Contains top_users and message_share arrays
@@ -211,16 +236,46 @@ function renderPieChart(data) {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
+                title: {
+                    display: true,
+                    text: 'Top 5 Most Active Users',
+                    font: {
+                        size: 18,
+                        weight: 'bold'
+                    },
+                    padding: {
+                        top: 10,
+                        bottom: 20
+                    },
+                    color: '#2c3e50'
+                },
                 legend: {
                     position: 'bottom',
                     labels: {
                         font: {
-                            size: 13,
+                            size: 14,
                             weight: '500'
                         },
                         padding: 15,
                         usePointStyle: true,
-                        pointStyle: 'circle'
+                        pointStyle: 'circle',
+                        generateLabels: function(chart) {
+                            const data = chart.data;
+                            if (data.labels.length && data.datasets.length) {
+                                return data.labels.map((label, i) => {
+                                    const value = data.datasets[0].data[i];
+                                    const total = data.datasets[0].data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((value / total) * 100).toFixed(1);
+                                    return {
+                                        text: `${label}: ${value} (${percentage}%)`,
+                                        fillStyle: data.datasets[0].backgroundColor[i],
+                                        hidden: false,
+                                        index: i
+                                    };
+                                });
+                            }
+                            return [];
+                        }
                     }
                 },
                 tooltip: {
@@ -240,7 +295,7 @@ function renderPieChart(data) {
                             const value = context.parsed || 0;
                             const total = context.dataset.data.reduce((a, b) => a + b, 0);
                             const percentage = ((value / total) * 100).toFixed(1);
-                            return `${label}: ${value} (${percentage}%)`;
+                            return `${label}: ${value} messages (${percentage}%)`;
                         }
                     }
                 }
@@ -266,7 +321,7 @@ function renderPieChart(data) {
     }
 }
 
-/* ===================== DATA TABLE ===================== */
+/* ===================== USER DATA TABLE ===================== */
 /**
  * Renders a table showing all users and their message counts
  * @param {Object} data - Contains top_users and message_share arrays
@@ -356,36 +411,241 @@ function renderTable(data) {
     }
 }
 
-/* ===================== UTILITY FUNCTIONS ===================== */
+/* ===================== EMOJI PIE CHART ===================== */
 /**
- * Renders all visualizations at once
- * @param {Object} data - Complete analysis data
+ * Renders a pie chart showing top 5 emojis
+ * @param {Object} data - Contains emoji_list [[emoji, count], ...]
  */
-function renderAllVisualizations(data) {
-    if (!data) {
-        console.error("No data provided for visualization");
-        return;
-    }
+function renderEmojiPieChart(data) {
+    try {
+        const canvas = document.getElementById("EmojipieChart");
+        if (!canvas) {
+            console.error("Emoji pie chart canvas not found");
+            return;
+        }
 
-    renderBarChart(data);
-    renderPieChart(data);
-    renderTable(data);
+        const ctx = canvas.getContext("2d");
+
+        const emojiList = data.emoji_list || [];
+
+        if (!emojiList.length) {
+            console.warn("No emoji data available");
+            return;
+        }
+
+        // Take top 5 emojis
+        const topEmojis = emojiList.slice(0, 5);
+
+        // Separate labels and values
+        const labels = topEmojis.map(item => item[0]);
+        const values = topEmojis.map(item => item[1]);
+
+        // Show emoji pie chart container
+        const EmojipieContainer = document.getElementById("EmojipieChartContainer");
+        if (EmojipieContainer) {
+            EmojipieContainer.style.display = "block";
+        }
+
+        // Destroy previous chart instance
+        EmojipieChart = destroyChart(EmojipieChart);
+
+        const backgroundColors = [
+            'rgba(102, 126, 234, 0.8)',
+            'rgba(240, 147, 251, 0.8)',
+            'rgba(79, 172, 254, 0.8)',
+            'rgba(67, 233, 123, 0.8)',
+            'rgba(245, 87, 108, 0.8)'
+        ];
+
+        const borderColors = [
+            'rgba(102, 126, 234, 1)',
+            'rgba(240, 147, 251, 1)',
+            'rgba(79, 172, 254, 1)',
+            'rgba(67, 233, 123, 1)',
+            'rgba(245, 87, 108, 1)'
+        ];
+
+        const chartData = {
+            labels: labels,
+            datasets: [{
+                data: values,
+                backgroundColor: backgroundColors.slice(0, labels.length),
+                borderColor: borderColors.slice(0, labels.length),
+                borderWidth: 2,
+                hoverOffset: 15
+            }]
+        };
+
+        const chartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Top 5 Most Used Emojis',
+                    font: {
+                        size: 18,
+                        weight: 'bold'
+                    },
+                    padding: {
+                        top: 10,
+                        bottom: 20
+                    },
+                    color: '#2c3e50'
+                },
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        font: {
+                            size: 14,
+                            weight: '500'
+                        },
+                        padding: 15,
+                        usePointStyle: true,
+                        pointStyle: 'circle',
+                        generateLabels: function(chart) {
+                            const data = chart.data;
+                            if (data.labels.length && data.datasets.length) {
+                                return data.labels.map((label, i) => {
+                                    const value = data.datasets[0].data[i];
+                                    const total = data.datasets[0].data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((value / total) * 100).toFixed(1);
+                                    return {
+                                        text: `${label}: ${value} (${percentage}%)`,
+                                        fillStyle: data.datasets[0].backgroundColor[i],
+                                        hidden: false,
+                                        index: i
+                                    };
+                                });
+                            }
+                            return [];
+                        }
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    padding: 12,
+                    titleFont: {
+                        size: 14,
+                        weight: 'bold'
+                    },
+                    bodyFont: {
+                        size: 13
+                    },
+                    cornerRadius: 8,
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.parsed || 0;
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = ((value / total) * 100).toFixed(1);
+                            return `${label}: ${value} times (${percentage}%)`;
+                        }
+                    }
+                }
+            },
+            animation: {
+                animateRotate: true,
+                animateScale: true,
+                duration: 1000,
+                easing: 'easeInOutQuart'
+            }
+        };
+
+        EmojipieChart = new Chart(ctx, {
+            type: "pie",
+            data: chartData,
+            options: chartOptions
+        });
+
+        console.log("✅ Emoji Pie Chart rendered");
+
+    } catch (err) {
+        console.error("❌ Emoji Pie Chart Error:", err);
+    }
 }
 
+/* ===================== EMOJI DATA TABLE ===================== */
 /**
- * Clears all charts and tables
+ * Renders a table showing all emojis and their usage counts
+ * @param {Object} data - Contains emoji_list [[emoji, count], ...]
  */
-function clearAllVisualizations() {
-    analysisChart = destroyChart(analysisChart);
-    pieChart = destroyChart(pieChart);
-    destroyTable();
-    
-    const pieContainer = document.getElementById("pieChartContainer");
-    if (pieContainer) {
-        pieContainer.style.display = "none";
+function renderEmojiTable(data) {
+    try {
+        destroyEmojiTable();
+
+        const emojiList = data.emoji_list || [];
+
+        if (!emojiList.length) {
+            console.warn("No emoji table data available");
+            return;
+        }
+
+        // Get container
+        const container = document.getElementById("emoji-table-container");
+        if (!container) {
+            console.error("Emoji table container not found");
+            return;
+        }
+
+        // Clear and show container
+        container.innerHTML = "";
+        container.style.display = "block";
+
+        // Create table element
+        const table = document.createElement("table");
+        table.id = "emojiDataTable";
+
+        // Create table header
+        const thead = document.createElement("thead");
+        const headerRow = document.createElement("tr");
+
+        const headers = ["Rank", "Emoji", "Count"];
+        headers.forEach(text => {
+            const th = document.createElement("th");
+            th.textContent = text;
+            headerRow.appendChild(th);
+        });
+
+        thead.appendChild(headerRow);
+        table.appendChild(thead);
+
+        // Create table body
+        const tbody = document.createElement("tbody");
+
+        emojiList.forEach((item, index) => {
+            const tr = document.createElement("tr");
+
+            // Rank cell
+            const tdRank = document.createElement("td");
+            tdRank.textContent = index + 1;
+            tdRank.style.fontWeight = "600";
+            tdRank.style.color = "#667eea";
+
+            // Emoji cell
+            const tdEmoji = document.createElement("td");
+            tdEmoji.textContent = item[0];
+            tdEmoji.style.fontSize = "20px";
+
+            // Count cell
+            const tdCount = document.createElement("td");
+            tdCount.textContent = item[1]?.toLocaleString() ?? "0";
+            tdCount.style.fontWeight = "600";
+
+            tr.appendChild(tdRank);
+            tr.appendChild(tdEmoji);
+            tr.appendChild(tdCount);
+            tbody.appendChild(tr);
+        });
+
+        table.appendChild(tbody);
+        container.appendChild(table);
+
+        console.log(`✅ Emoji table rendered with ${emojiList.length} rows`);
+
+    } catch (err) {
+        console.error("❌ Emoji Table Render Error:", err);
     }
-    
-    console.log("✅ All visualizations cleared");
 }
 
 /* ===================== WORD CLOUD ===================== */
@@ -530,4 +790,413 @@ function renderWordCloud(data) {
     } catch (err) {
         console.error("❌ Word Cloud Error:", err);
     }
+}
+let timelineChart = null;
+
+/**
+ * Renders a line chart showing message count per month
+ * @param {Object} data - Contains monthly_timeline [[month, count], ...]
+ */
+function renderLineChartM(data) {
+    try {
+        const canvas = document.getElementById("timelineChartM");
+        if (!canvas) {
+            console.error("Timeline chart canvas not found");
+            return;
+        }
+
+        const ctx = canvas.getContext("2d");
+        // Separate months and counts
+        const months = data.time_m || [];
+        const counts = data.message_cont_m || [];
+
+        if (!months) {
+            console.warn("No monthly timeline data available");
+            return;
+        }
+
+        // Show timeline chart container
+        const timelineContainer = document.getElementById("timelineChartContainer");
+        if (timelineContainer) {
+            timelineContainer.style.display = "block";
+        }
+
+        // Destroy previous chart instance
+        timelineChart = destroyChart(timelineChart);
+
+
+
+        const chartData = {
+            labels: months,
+            datasets: [{
+                label: 'Messages per Month',
+                data: counts,
+                borderColor: 'rgba(102, 126, 234, 1)',
+                backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 5,
+                pointBackgroundColor: 'rgba(102, 126, 234, 1)',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointHoverRadius: 7,
+                pointHoverBackgroundColor: 'rgba(102, 126, 234, 1)',
+                pointHoverBorderColor: '#fff',
+                pointHoverBorderWidth: 3
+            }]
+        };
+
+        const chartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Message Activity Over Time',
+                    font: {
+                        size: 20,
+                        weight: 'bold'
+                    },
+                    padding: {
+                        top: 10,
+                        bottom: 30
+                    },
+                    color: '#2c3e50'
+                },
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: {
+                        font: {
+                            size: 14,
+                            weight: '600'
+                        },
+                        padding: 20,
+                        usePointStyle: true
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    padding: 12,
+                    titleFont: {
+                        size: 14,
+                        weight: 'bold'
+                    },
+                    bodyFont: {
+                        size: 13
+                    },
+                    cornerRadius: 8,
+                    callbacks: {
+                        label: function(context) {
+                            const value = context.parsed.y;
+                            return `Messages: ${value.toLocaleString()}`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        font: {
+                            size: 12
+                        },
+                        padding: 8,
+                        callback: function(value) {
+                            return value.toLocaleString();
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)',
+                        drawBorder: false
+                    },
+                    title: {
+                        display: true,
+                        text: 'Number of Messages',
+                        font: {
+                            size: 13,
+                            weight: '600'
+                        },
+                        padding: {
+                            top: 10,
+                            bottom: 0
+                        }
+                    }
+                },
+                x: {
+                    ticks: {
+                        font: {
+                            size: 11,
+                            weight: '500'
+                        },
+                        padding: 8,
+                        maxRotation: 45,
+                        minRotation: 45
+                    },
+                    grid: {
+                        display: false
+                    },
+                    title: {
+                        display: true,
+                        text: 'Month',
+                        font: {
+                            size: 13,
+                            weight: '600'
+                        },
+                        padding: {
+                            top: 10,
+                            bottom: 0
+                        }
+                    }
+                }
+            },
+            animation: {
+                duration: 1000,
+                easing: 'easeInOutQuart'
+            },
+            interaction: {
+                intersect: false,
+                mode: 'index'
+            }
+        };
+
+        timelineChart = new Chart(ctx, {
+            type: "line",
+            data: chartData,
+            options: chartOptions
+        });
+
+        console.log("✅ Timeline chart rendered successfully");
+
+    } catch (err) {
+        console.error("❌ Timeline Chart Error:", err);
+    }
+}
+/**
+ * Renders a line chart showing message count per month
+ * @param {Object} data - Contains monthly_timeline [[month, count], ...]
+ */
+function renderLineChartD(data) {
+    try {
+        const canvas = document.getElementById("timelineChartD");
+        if (!canvas) {
+            console.error("Timeline chart canvas not found");
+            return;
+        }
+
+        const ctx = canvas.getContext("2d");
+        // Separate months and counts
+        const months = data.time_d || [];
+        const counts = data.message_cont_d|| [];
+
+        if (!months) {
+            console.warn("No monthly timeline data available");
+            return;
+        }
+
+        // Show timeline chart container
+        const timelineContainer = document.getElementById("timelineChartContainer");
+        if (timelineContainer) {
+            timelineContainer.style.display = "block";
+        }
+
+        // Destroy previous chart instance
+        timelineChart = destroyChart(timelineChart);
+
+
+
+        const chartData = {
+            labels: months,
+            datasets: [{
+                label: 'Messages per Day',
+                data: counts,
+                borderColor: 'rgb(33, 69, 233)',
+                backgroundColor: 'rgba(20, 50, 184, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 5,
+                pointBackgroundColor: 'rgb(25, 54, 181)',
+                pointBorderColor: '#dad6d6',
+                pointBorderWidth: 2,
+                pointHoverRadius: 7,
+                pointHoverBackgroundColor: 'rgb(47, 76, 206)',
+                pointHoverBorderColor: '#fdad6d6ff',
+                pointHoverBorderWidth: 3
+            }]
+        };
+
+        const chartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Message Activity Over Time',
+                    font: {
+                        size: 20,
+                        weight: 'bold'
+                    },
+                    padding: {
+                        top: 10,
+                        bottom: 30
+                    },
+                    color: '#2c3e50'
+                },
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: {
+                        font: {
+                            size: 14,
+                            weight: '600'
+                        },
+                        padding: 20,
+                        usePointStyle: true
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    padding: 12,
+                    titleFont: {
+                        size: 14,
+                        weight: 'bold'
+                    },
+                    bodyFont: {
+                        size: 13
+                    },
+                    cornerRadius: 8,
+                    callbacks: {
+                        label: function(context) {
+                            const value = context.parsed.y;
+                            return `Messages: ${value.toLocaleString()}`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        font: {
+                            size: 12
+                        },
+                        padding: 8,
+                        callback: function(value) {
+                            return value.toLocaleString();
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)',
+                        drawBorder: false
+                    },
+                    title: {
+                        display: true,
+                        text: 'Number of Messages',
+                        font: {
+                            size: 13,
+                            weight: '600'
+                        },
+                        padding: {
+                            top: 10,
+                            bottom: 0
+                        }
+                    }
+                },
+                x: {
+                    ticks: {
+                        font: {
+                            size: 11,
+                            weight: '500'
+                        },
+                        padding: 8,
+                        maxRotation: 45,
+                        minRotation: 45
+                    },
+                    grid: {
+                        display: false
+                    },
+                    title: {
+                        display: true,
+                        text: 'Month',
+                        font: {
+                            size: 13,
+                            weight: '600'
+                        },
+                        padding: {
+                            top: 10,
+                            bottom: 0
+                        }
+                    }
+                }
+            },
+            animation: {
+                duration: 1000,
+                easing: 'easeInOutQuart'
+            },
+            interaction: {
+                intersect: false,
+                mode: 'index'
+            }
+        };
+
+        timelineChart = new Chart(ctx, {
+            type: "line",
+            data: chartData,
+            options: chartOptions
+        });
+
+        console.log("✅ Timeline chart rendered successfully");
+
+    } catch (err) {
+        console.error("❌ Timeline Chart Error:", err);
+    }
+}
+
+/* ===================== UTILITY FUNCTIONS ===================== */
+/**
+ * Renders all visualizations at once
+ * @param {Object} data - Complete analysis data
+ */
+function renderAllVisualizations(data) {
+    if (!data) {
+        console.error("No data provided for visualization");
+        return;
+    }
+
+    renderBarChart(data);
+    renderPieChart(data);
+    renderTable(data);
+    renderEmojiPieChart(data);
+    renderEmojiTable(data);
+    renderLineChartM(data)
+    renderLineChartD(data)
+}
+
+/**
+ * Clears all charts and tables
+ */
+function clearAllVisualizations() {
+    analysisChart = destroyChart(analysisChart);
+    pieChart = destroyChart(pieChart);
+    EmojipieChart = destroyChart(EmojipieChart);
+    timelineChart=destroyChart(timelineChart);
+    destroyTable();
+    destroyEmojiTable();
+    
+    const pieContainer = document.getElementById("pieChartContainer");
+    if (pieContainer) {
+        pieContainer.style.display = "none";
+    }
+    
+    const EmojipieContainer = document.getElementById("EmojipieChartContainer");
+    if (EmojipieContainer) {
+        EmojipieContainer.style.display = "none";
+    }
+        const timelineContainer = document.getElementById("timelineChartContainer");
+    if (timelineContainer) {
+        timelineContainer.style.display = "none";
+    }
+    console.log("✅ All visualizations cleared");
 }

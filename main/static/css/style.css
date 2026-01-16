@@ -172,6 +172,7 @@ button:hover {
     justify-content: space-between;
     align-items: flex-start;
     margin-top: 50px;
+    margin-bottom: 50px;
 }
 
 /* ===================== PIE CHART ===================== */
@@ -189,13 +190,28 @@ button:hover {
     width: 100% !important;
 }
 
+/* ===================== EMOJI PIE CHART ===================== */
+#EmojipieChartContainer {
+    flex: 1;
+    min-width: 400px;
+    background: #f9fafb;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+#EmojipieChart {
+    max-height: 400px;
+    width: 100% !important;
+}
+
 /* ===================== TABLE ===================== */
 .table-box {
     flex: 1;
     min-width: 400px;
 }
 
-/* Scrollable container */
+/* Scrollable container for user table */
 #table-container {
     max-height: 500px;
     overflow-y: auto;
@@ -203,22 +219,34 @@ button:hover {
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
 }
 
-/* Table styling */
-#dataTable {
+/* Scrollable container for emoji table */
+#emoji-table-container {
+    max-height: 500px;
+    overflow-y: auto;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+/* Table styling - applies to both user and emoji tables */
+#dataTable,
+#emojiDataTable {
     width: 100%;
     border-collapse: collapse;
     background: #ffffff;
 }
 
 #dataTable th,
-#dataTable td {
+#dataTable td,
+#emojiDataTable th,
+#emojiDataTable td {
     padding: 16px;
     border: 1px solid #e5e7eb;
     text-align: center;
     font-size: 15px;
 }
 
-#dataTable th {
+#dataTable th,
+#emojiDataTable th {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: #fff;
     position: sticky;
@@ -229,32 +257,62 @@ button:hover {
     letter-spacing: 0.5px;
 }
 
-#dataTable tbody tr:nth-child(even) {
+#dataTable tbody tr:nth-child(even),
+#emojiDataTable tbody tr:nth-child(even) {
     background-color: #f9fafb;
 }
 
-#dataTable tbody tr:hover {
+#dataTable tbody tr:hover,
+#emojiDataTable tbody tr:hover {
     background-color: #f3f4f6;
     transition: background-color 0.2s;
 }
 
-/* Scrollbar */
-#table-container::-webkit-scrollbar {
+/* Scrollbar styling for both tables */
+#table-container::-webkit-scrollbar,
+#emoji-table-container::-webkit-scrollbar {
     width: 10px;
 }
 
-#table-container::-webkit-scrollbar-track {
+#table-container::-webkit-scrollbar-track,
+#emoji-table-container::-webkit-scrollbar-track {
     background: #f1f1f1;
     border-radius: 10px;
 }
 
-#table-container::-webkit-scrollbar-thumb {
+#table-container::-webkit-scrollbar-thumb,
+#emoji-table-container::-webkit-scrollbar-thumb {
     background: #c1c1c1;
     border-radius: 10px;
 }
 
-#table-container::-webkit-scrollbar-thumb:hover {
+#table-container::-webkit-scrollbar-thumb:hover,
+#emoji-table-container::-webkit-scrollbar-thumb:hover {
     background: #a8a8a8;
+}
+
+/* ===================== WORD CLOUD ===================== */
+.word-cloud-container {
+    width: 100%;
+    background: #f9fafb;
+    padding: 30px;
+    border-radius: 12px;
+    margin: 40px 0;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.word-cloud-container h3 {
+    text-align: center;
+    color: #2c3e50;
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+#wordCloud {
+    width: 100%;
+    height: 500px;
+    display: block;
 }
 
 /* ===================== RESPONSIVE ===================== */
@@ -265,12 +323,14 @@ button:hover {
     }
 
     #pieChartContainer,
+    #EmojipieChartContainer,
     .table-box {
         width: 100%;
         min-width: unset;
     }
 
-    #pieChart {
+    #pieChart,
+    #EmojipieChart {
         max-height: 350px;
     }
 }
@@ -298,6 +358,15 @@ button:hover {
         height: 400px !important;
         max-height: 400px;
     }
+
+    .chart-table-wrapper {
+        gap: 20px;
+    }
+
+    #pieChartContainer,
+    #EmojipieChartContainer {
+        padding: 20px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -315,17 +384,8 @@ button:hover {
     button {
         width: 100%;
     }
-}
-.word-cloud-container {
-    width: 100%;
-    background: #f9fafb;
-    padding: 30px;
-    border-radius: 12px;
-    margin: 40px 0;
-}
 
-#wordCloud {
-    width: 100%;
-    height: 500px;
-    display: block;
+    .chart-table-wrapper {
+        gap: 15px;
+    }
 }

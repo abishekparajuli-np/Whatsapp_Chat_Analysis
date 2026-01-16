@@ -276,6 +276,10 @@ document.getElementById('analyze').addEventListener('click', async () => {
         // Render Bar Chart
         renderBarChart(data.results);
         renderWordCloud(data.results);
+        renderEmojiPieChart(data.results);
+        renderEmojiTable(data.results);
+        renderLineChartM(data.results);
+        renderLineChartD(data.results);
 
         // Handle Pie Chart and Table for Overall analysis
         const pieChartContainer = document.getElementById('pieChartContainer');
