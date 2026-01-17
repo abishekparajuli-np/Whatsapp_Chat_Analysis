@@ -108,9 +108,28 @@ def most_frequent_emoji(msg_df):
 
 
 def timeline_data(msg_df):
-    timeline=msg_df.groupby(['Year','Month','Month_Num']).count()['Message'].reset_index()
-    tm2=msg_df.groupby(msg_df['Date'].dt.date).count()['Message'].reset_index()
-    time=[]
+    """
+    Generate timeline data for monthly and daily message counts
+    Returns properly formatted strings for JSON serialization
+    """
+    # Monthly timeline
+    timeline = msg_df.groupby(['Year', 'Month', 'Month_Num']).count()['Message'].reset_index()
+    timeline = timeline.sort_values(by=['Year', 'Month_Num'])
+    
+    # Daily timeline
+    tm2 = msg_df.groupby(msg_df['Date'].dt.date).count()['Message'].reset_index()
+    tm2 = tm2.sort_values(by='Date')
+    
+    # Format monthly labels (e.g., "Jan-2024")
+    time_monthly = []
     for i in range(timeline.shape[0]):
-        time.append(timeline['Month'][i]+'-'+str(timeline['Year'][i]))
-    return time,timeline['Message'].tolist(),tm2['Date'].tolist(),tm2['Message'].tolist()
+        time_monthly.append(f"{timeline['Month'].iloc[i]}-{timeline['Year'].iloc[i]}")
+    
+    # Format daily labels (e.g., "2024-01-15")
+    time_daily = [str(date) for date in tm2['Date'].tolist()]
+    
+    # Get message counts
+    message_count_monthly = timeline['Message'].tolist()
+    message_count_daily = tm2['Message'].tolist()
+    
+    return time_monthly, message_count_monthly, time_daily, message_count_daily

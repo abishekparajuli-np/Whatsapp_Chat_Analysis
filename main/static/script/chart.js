@@ -808,7 +808,7 @@ function renderLineChartM(data) {
         const ctx = canvas.getContext("2d");
         // Separate months and counts
         const months = data.time_m || [];
-        const counts = data.message_cont_m || [];
+        const counts = data.message_count_m || [];
 
         if (!months) {
             console.warn("No monthly timeline data available");
@@ -988,7 +988,7 @@ function renderLineChartD(data) {
         const ctx = canvas.getContext("2d");
         // Separate months and counts
         const months = data.time_d || [];
-        const counts = data.message_cont_d|| [];
+        const counts = data.message_count_d|| [];
 
         if (!months) {
             console.warn("No monthly timeline data available");
