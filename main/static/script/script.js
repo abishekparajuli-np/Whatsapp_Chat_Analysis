@@ -280,6 +280,10 @@ document.getElementById('analyze').addEventListener('click', async () => {
         renderEmojiTable(data.results);
         renderLineChartM(data.results);
         renderLineChartD(data.results);
+        renderLineChartH(data.results);
+        renderDayBarChart(data.results);     
+        renderMonthBarChart(data.results);
+        renderHeatmap(data.results);
 
         // Handle Pie Chart and Table for Overall analysis
         const pieChartContainer = document.getElementById('pieChartContainer');

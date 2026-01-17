@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <title>WhatsApp Chat Analysis</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -64,6 +65,18 @@
 <div id="timelineChartDContainer" style="display:none">
     <canvas id="timelineChartD"></canvas>
 </div>
+<div id="timelineChartHContainer" style="display:none">
+    <canvas id="timelineChartH"></canvas>
+</div>
+    <!-- Day of Week Bar Chart -->
+<div id="dayBarChartContainer" style="display: none;">
+    <canvas id="dayBarChart"></canvas>
+</div>
+
+<!-- Month Bar Chart -->
+<div id="monthBarChartContainer" style="display: none;">
+    <canvas id="monthBarChart"></canvas>
+</div>
         <!-- Word Cloud -->
         <div class="word-cloud-container">
             <canvas id="wordCloud"></canvas>
@@ -78,9 +91,42 @@
                 <div id="emoji-table-container"></div>
             </div>
         </div>
+<div id="heatmapChartContainer" style="display: none;">
+    <canvas id="heatmapChart"></canvas>
+    
+    <!-- Optional Legend -->
+    <div class="heatmap-gradient-bar"></div>
+    <div class="heatmap-gradient-labels">
+        <span>Low Activity</span>
+        <span>High Activity</span>
     </div>
-
+    
+    <!-- Optional Info Section -->
+    <div class="heatmap-info">
+        <div class="heatmap-info-item">
+            <span class="heatmap-info-label">Peak Time</span>
+            <span class="heatmap-info-value" id="heatmap-peak">-</span>
+        </div>
+        <div class="heatmap-info-item">
+            <span class="heatmap-info-label">Total Messages</span>
+            <span class="heatmap-info-value" id="heatmap-total">-</span>
+        </div>
+        <div class="heatmap-info-item">
+            <span class="heatmap-info-label">Most Active Day</span>
+            <span class="heatmap-info-value" id="heatmap-active-day">-</span>
+        </div>
+    </div>
+</div>
+    </div>
+<!-- Core Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1"></script>
+    
+    <!-- Matrix/Heatmap Plugin -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-matrix@1.3.0"></script>
+    
+    <!-- Your scripts -->
     <script src="{{ url_for('static', filename='script/script.js') }}"></script>
     <script src="{{ url_for('static', filename='script/chart.js') }}"></script>
+</body>
 </body>
 </html>

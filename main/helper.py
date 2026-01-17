@@ -19,7 +19,9 @@ def fetch_stats(selected_user,df):
     word_list=word_cloud_words(df)
     emoji_list=most_frequent_emoji(df)
     time_m,message_count_m,time_d,message_count_d,time_h,message_count_h=timeline_data(df)
-    return num_messages,n_words,n_medias,n_links,word_list,emoji_list,time_m,message_count_m,time_d,message_count_d,time_h,message_count_h
+    message_count_monthly,message_count_weekly,day_names,month_names=bar_data(df)
+    pivot=heat_map(df)
+    return num_messages,n_words,n_medias,n_links,word_list,emoji_list,time_m,message_count_m,time_d,message_count_d,time_h,message_count_h,message_count_monthly,message_count_weekly,day_names,month_names,pivot
 
 
 
@@ -108,34 +110,49 @@ def most_frequent_emoji(msg_df):
 
 
 def timeline_data(msg_df):
-    """
-    Generate timeline data for monthly and daily message counts
-    Returns properly formatted strings for JSON serialization
-    """
-    # Monthly timeline
+
     timeline = msg_df.groupby(['Year', 'Month', 'Month_Num']).count()['Message'].reset_index()
     timeline = timeline.sort_values(by=['Year', 'Month_Num'])
-    
-    # Daily timeline
+
     tm2 = msg_df.groupby(msg_df['Date'].dt.date).count()['Message'].reset_index()
     tm2 = tm2.sort_values(by='Date')
-    
-    #Hourly timeline
-    tm3=msg_df.groupby(msg_df['Date'].dt.hour).count()['Message'].reset_index()
-    tm3=tm3.sort_value(by='Date')
 
-    # Format monthly labels (e.g., "Jan-2024")
+    tm3=msg_df.groupby(msg_df['Date'].dt.hour).count()['Message'].reset_index()
+    tm3=tm3.sort_values(by='Date')
+
     time_monthly = []
     for i in range(timeline.shape[0]):
         time_monthly.append(f"{timeline['Month'].iloc[i]}-{timeline['Year'].iloc[i]}")
-    
-    # Format daily labels (e.g., "2024-01-15")
+ 
     time_daily = [str(date) for date in tm2['Date'].tolist()]
     time_hourly= [str(date) for date in tm3['Date'].tolist()]
     
-    # Get message counts
     message_count_monthly = timeline['Message'].tolist()
     message_count_daily = tm2['Message'].tolist()
     message_count_hourly = tm3['Message'].tolist()
     
     return time_monthly, message_count_monthly, time_daily, message_count_daily,time_hourly,message_count_hourly
+
+def bar_data(msg_df):
+    day_df=msg_df.groupby(['Day_Week','Week_Num']).count()['Message'].reset_index()
+    day_df.sort_values(by=['Week_Num'],inplace=True)
+
+    month_df=msg_df.groupby(['Month','Month_Num']).count()['Message'].reset_index()
+    month_df.sort_values(by=['Month_Num'],inplace=True)
+    
+    message_count_weekly=day_df['Message'].tolist()
+    message_count_monthly=month_df['Message'].tolist()
+    
+    day_names=day_df['Day_Week'].tolist()
+    month_names=month_df['Month'].tolist()
+
+    return message_count_monthly,message_count_weekly,day_names,month_names
+
+def heat_map(msg_df):
+    pivot = msg_df.pivot_table(
+    index='Day_Week', 
+    columns='Period', 
+    values='Message', 
+    aggfunc='count'
+    ).fillna(0)
+    return pivot

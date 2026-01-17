@@ -5,6 +5,10 @@ let pieChart = null;
 let EmojipieChart = null;
 let timelineChartM = null;
 let timelineChartD = null;
+let timelineChartH = null;
+let dayBarChart = null;
+let monthBarChart = null;
+
 /**
  * Safely destroys and clears the data table
  */
@@ -32,7 +36,7 @@ function destroyEmojiTable() {
  */
 function destroyChart(chartInstance) {
     if (chartInstance) {
-        chartInstance.destroy();
+        chartInstance. destroy();
         return null;
     }
     return chartInstance;
@@ -57,12 +61,12 @@ function renderBarChart(data) {
         analysisChart = destroyChart(analysisChart);
 
         const chartData = {
-            labels: ["Messages", "Media Shared", "Links Shared"],
+            labels:  ["Messages", "Media Shared", "Links Shared"],
             datasets: [{
                 label: "Chat Analysis",
                 data: [
-                    data.num_messages ?? 0,
-                    data.num_medias ?? 0,
+                    data.num_messages ??  0,
+                    data. num_medias ?? 0,
                     data.num_links ?? 0,
                 ],
                 backgroundColor: [
@@ -70,7 +74,7 @@ function renderBarChart(data) {
                     'rgba(118, 75, 162, 0.8)',
                     'rgba(67, 233, 123, 0.8)'
                 ],
-                borderColor: [
+                borderColor:  [
                     'rgba(102, 126, 234, 1)',
                     'rgba(118, 75, 162, 1)',
                     'rgba(67, 233, 123, 1)'
@@ -82,7 +86,7 @@ function renderBarChart(data) {
         };
 
         const chartOptions = {
-            responsive: true,
+            responsive:  true,
             maintainAspectRatio: false,
             plugins: {
                 title: {
@@ -98,7 +102,7 @@ function renderBarChart(data) {
                     },
                     color: '#2c3e50'
                 },
-                legend: {
+                legend:  {
                     display: true,
                     position: 'top',
                     labels: {
@@ -107,7 +111,7 @@ function renderBarChart(data) {
                             weight: '600'
                         },
                         padding: 20,
-                        usePointStyle: true
+                        usePointStyle:  true
                     }
                 },
                 tooltip: {
@@ -132,7 +136,7 @@ function renderBarChart(data) {
                         },
                         padding: 8
                     },
-                    grid: {
+                    grid:  {
                         color: 'rgba(0, 0, 0, 0.05)',
                         drawBorder: false
                     }
@@ -145,7 +149,7 @@ function renderBarChart(data) {
                         },
                         padding: 8
                     },
-                    grid: {
+                    grid:  {
                         display: false
                     }
                 }
@@ -169,6 +173,392 @@ function renderBarChart(data) {
     }
 }
 
+/* ===================== DAY OF WEEK BAR CHART ===================== */
+/**
+ * Renders a bar chart showing messages per day of week
+ * @param {Object} data - Contains day_name array and message_count_dn array
+ */
+function renderDayBarChart(data) {
+    try {
+        const canvas = document. getElementById("dayBarChart");
+        if (!canvas) {
+            console.error("Day bar chart canvas not found");
+            return;
+        }
+
+        const ctx = canvas. getContext("2d");
+
+        const days = data.day_name || [];
+        const counts = data.message_count_dn || [];
+
+        if (!days. length || !counts.length) {
+            console.warn("No day of week data available");
+            return;
+        }
+
+        // Show day bar chart container
+        const dayBarContainer = document.getElementById("dayBarChartContainer");
+        if (dayBarContainer) {
+            dayBarContainer.style.display = "block";
+        }
+
+        // Destroy previous chart instance
+        dayBarChart = destroyChart(dayBarChart);
+
+        // Colors for each day of the week
+        const backgroundColors = [
+            'rgba(255, 99, 132, 0.8)',   // Sunday - Red
+            'rgba(255, 159, 64, 0.8)',   // Monday - Orange
+            'rgba(255, 205, 86, 0.8)',   // Tuesday - Yellow
+            'rgba(75, 192, 192, 0.8)',   // Wednesday - Teal
+            'rgba(54, 162, 235, 0.8)',   // Thursday - Blue
+            'rgba(153, 102, 255, 0.8)',  // Friday - Purple
+            'rgba(102, 126, 234, 0.8)'   // Saturday - Indigo
+        ];
+
+        const borderColors = [
+            'rgba(255, 99, 132, 1)',
+            'rgba(255, 159, 64, 1)',
+            'rgba(255, 205, 86, 1)',
+            'rgba(75, 192, 192, 1)',
+            'rgba(54, 162, 235, 1)',
+            'rgba(153, 102, 255, 1)',
+            'rgba(102, 126, 234, 1)'
+        ];
+
+        const chartData = {
+            labels:  days,
+            datasets: [{
+                label: 'Messages per Day',
+                data: counts,
+                backgroundColor: backgroundColors. slice(0, days.length),
+                borderColor: borderColors.slice(0, days.length),
+                borderWidth: 2,
+                borderRadius: 8,
+                barThickness: 50,
+            }]
+        };
+
+        const chartOptions = {
+            responsive:  true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Messages by Day of Week',
+                    font: {
+                        size: 20,
+                        weight: 'bold'
+                    },
+                    padding: {
+                        top: 10,
+                        bottom: 30
+                    },
+                    color: '#2c3e50'
+                },
+                legend: {
+                    display: true,
+                    position:  'top',
+                    labels: {
+                        font: {
+                            size: 14,
+                            weight: '600'
+                        },
+                        padding: 20,
+                        usePointStyle: true
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    padding: 12,
+                    titleFont: {
+                        size: 14,
+                        weight: 'bold'
+                    },
+                    bodyFont:  {
+                        size: 13
+                    },
+                    cornerRadius: 8,
+                    callbacks: {
+                        label: function(context) {
+                            const value = context. parsed.y;
+                            return `Messages: ${value.toLocaleString()}`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        font: {
+                            size:  12
+                        },
+                        padding: 8,
+                        callback: function(value) {
+                            return value. toLocaleString();
+                        }
+                    },
+                    grid: {
+                        color:  'rgba(0, 0, 0, 0.05)',
+                        drawBorder:  false
+                    },
+                    title: {
+                        display: true,
+                        text: 'Number of Messages',
+                        font: {
+                            size: 13,
+                            weight: '600'
+                        },
+                        padding: {
+                            top: 10,
+                            bottom: 0
+                        }
+                    }
+                },
+                x: {
+                    ticks: {
+                        font: {
+                            size: 13,
+                            weight: '500'
+                        },
+                        padding: 8
+                    },
+                    grid:  {
+                        display: false
+                    },
+                    title:  {
+                        display: true,
+                        text: 'Day of Week',
+                        font:  {
+                            size: 13,
+                            weight: '600'
+                        },
+                        padding: {
+                            top:  10,
+                            bottom:  0
+                        }
+                    }
+                }
+            },
+            animation: {
+                duration: 1000,
+                easing: 'easeInOutQuart'
+            }
+        };
+
+        dayBarChart = new Chart(ctx, {
+            type: "bar",
+            data:  chartData,
+            options: chartOptions
+        });
+
+        console.log("✅ Day bar chart rendered successfully");
+
+    } catch (err) {
+        console.error("❌ Day Bar Chart Error:", err);
+    }
+}
+
+/* ===================== MONTH BAR CHART ===================== */
+/**
+ * Renders a bar chart showing messages per month
+ * @param {Object} data - Contains month_name array and message_count_mn array
+ */
+function renderMonthBarChart(data) {
+    try {
+        const canvas = document.getElementById("monthBarChart");
+        if (!canvas) {
+            console.error("Month bar chart canvas not found");
+            return;
+        }
+
+        const ctx = canvas.getContext("2d");
+
+        const months = data.month_name || [];
+        const counts = data.message_count_mn || [];
+
+        if (!months.length || !counts. length) {
+            console.warn("No month data available");
+            return;
+        }
+
+        // Show month bar chart container
+        const monthBarContainer = document.getElementById("monthBarChartContainer");
+        if (monthBarContainer) {
+            monthBarContainer.style.display = "block";
+        }
+
+        // Destroy previous chart instance
+        monthBarChart = destroyChart(monthBarChart);
+
+        // Colors for each month (gradient from cool to warm)
+        const backgroundColors = [
+            'rgba(54, 162, 235, 0.8)',   // January - Blue
+            'rgba(75, 192, 192, 0.8)',   // February - Teal
+            'rgba(102, 126, 234, 0.8)',  // March - Indigo
+            'rgba(153, 102, 255, 0.8)',  // April - Purple
+            'rgba(240, 147, 251, 0.8)',  // May - Pink
+            'rgba(255, 99, 132, 0.8)',   // June - Red
+            'rgba(255, 159, 64, 0.8)',   // July - Orange
+            'rgba(255, 205, 86, 0.8)',   // August - Yellow
+            'rgba(67, 233, 123, 0.8)',   // September - Green
+            'rgba(79, 172, 254, 0.8)',   // October - Light Blue
+            'rgba(118, 75, 162, 0.8)',   // November - Dark Purple
+            'rgba(245, 87, 108, 0.8)'    // December - Coral
+        ];
+
+        const borderColors = [
+            'rgba(54, 162, 235, 1)',
+            'rgba(75, 192, 192, 1)',
+            'rgba(102, 126, 234, 1)',
+            'rgba(153, 102, 255, 1)',
+            'rgba(240, 147, 251, 1)',
+            'rgba(255, 99, 132, 1)',
+            'rgba(255, 159, 64, 1)',
+            'rgba(255, 205, 86, 1)',
+            'rgba(67, 233, 123, 1)',
+            'rgba(79, 172, 254, 1)',
+            'rgba(118, 75, 162, 1)',
+            'rgba(245, 87, 108, 1)'
+        ];
+
+        const chartData = {
+            labels: months,
+            datasets: [{
+                label: 'Messages per Month',
+                data: counts,
+                backgroundColor: backgroundColors.slice(0, months.length),
+                borderColor: borderColors.slice(0, months.length),
+                borderWidth: 2,
+                borderRadius: 8,
+                barThickness: 40,
+            }]
+        };
+
+        const chartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display:  true,
+                    text: 'Messages by Month',
+                    font: {
+                        size:  20,
+                        weight:  'bold'
+                    },
+                    padding: {
+                        top: 10,
+                        bottom: 30
+                    },
+                    color: '#2c3e50'
+                },
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: {
+                        font:  {
+                            size: 14,
+                            weight: '600'
+                        },
+                        padding: 20,
+                        usePointStyle: true
+                    }
+                },
+                tooltip:  {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    padding: 12,
+                    titleFont: {
+                        size: 14,
+                        weight: 'bold'
+                    },
+                    bodyFont: {
+                        size: 13
+                    },
+                    cornerRadius: 8,
+                    callbacks: {
+                        label: function(context) {
+                            const value = context.parsed. y;
+                            return `Messages: ${value.toLocaleString()}`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        font:  {
+                            size: 12
+                        },
+                        padding: 8,
+                        callback: function(value) {
+                            return value.toLocaleString();
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)',
+                        drawBorder: false
+                    },
+                    title: {
+                        display: true,
+                        text: 'Number of Messages',
+                        font: {
+                            size: 13,
+                            weight: '600'
+                        },
+                        padding:  {
+                            top: 10,
+                            bottom: 0
+                        }
+                    }
+                },
+                x: {
+                    ticks: {
+                        font: {
+                            size: 11,
+                            weight: '500'
+                        },
+                        padding: 8,
+                        maxRotation: 45,
+                        minRotation: 45
+                    },
+                    grid:  {
+                        display: false
+                    },
+                    title:  {
+                        display: true,
+                        text: 'Month',
+                        font: {
+                            size: 13,
+                            weight: '600'
+                        },
+                        padding:  {
+                            top: 10,
+                            bottom: 0
+                        }
+                    }
+                }
+            },
+            animation: {
+                duration: 1000,
+                easing:  'easeInOutQuart'
+            }
+        };
+
+        monthBarChart = new Chart(ctx, {
+            type: "bar",
+            data: chartData,
+            options: chartOptions
+        });
+
+        console.log("✅ Month bar chart rendered successfully");
+
+    } catch (err) {
+        console.error("❌ Month Bar Chart Error:", err);
+    }
+}
+
 /* ===================== USER PIE CHART ===================== */
 /**
  * Renders a pie chart showing top 5 users by message share
@@ -182,7 +572,7 @@ function renderPieChart(data) {
             return;
         }
 
-        const ctx = canvas.getContext("2d");
+        const ctx = canvas. getContext("2d");
 
         const tusers = data.top_users || [];
         const tshares = data.message_share || [];
@@ -223,11 +613,11 @@ function renderPieChart(data) {
         ];
 
         const chartData = {
-            labels: users,
+            labels:  users,
             datasets: [{
                 data: shares,
-                backgroundColor: backgroundColors.slice(0, users.length),
-                borderColor: borderColors.slice(0, users.length),
+                backgroundColor: backgroundColors. slice(0, users.length),
+                borderColor: borderColors. slice(0, users.length),
                 borderWidth: 2,
                 hoverOffset: 15
             }]
@@ -237,7 +627,7 @@ function renderPieChart(data) {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                title: {
+                title:  {
                     display: true,
                     text: 'Top 5 Most Active Users',
                     font: {
@@ -253,7 +643,7 @@ function renderPieChart(data) {
                 legend: {
                     position: 'bottom',
                     labels: {
-                        font: {
+                        font:  {
                             size: 14,
                             weight: '500'
                         },
@@ -294,7 +684,7 @@ function renderPieChart(data) {
                         label: function(context) {
                             const label = context.label || '';
                             const value = context.parsed || 0;
-                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const total = context.dataset.data. reduce((a, b) => a + b, 0);
                             const percentage = ((value / total) * 100).toFixed(1);
                             return `${label}: ${value} messages (${percentage}%)`;
                         }
@@ -310,7 +700,7 @@ function renderPieChart(data) {
         };
 
         pieChart = new Chart(ctx, {
-            type: "pie",
+            type:  "pie",
             data: chartData,
             options: chartOptions
         });
@@ -403,7 +793,7 @@ function renderTable(data) {
         });
 
         table.appendChild(tbody);
-        container.appendChild(table);
+        container. appendChild(table);
 
         console.log(`✅ Table rendered with ${users.length} rows`);
 
@@ -429,7 +819,7 @@ function renderEmojiPieChart(data) {
 
         const emojiList = data.emoji_list || [];
 
-        if (!emojiList.length) {
+        if (!emojiList. length) {
             console.warn("No emoji data available");
             return;
         }
@@ -469,7 +859,7 @@ function renderEmojiPieChart(data) {
         const chartData = {
             labels: labels,
             datasets: [{
-                data: values,
+                data:  values,
                 backgroundColor: backgroundColors.slice(0, labels.length),
                 borderColor: borderColors.slice(0, labels.length),
                 borderWidth: 2,
@@ -482,11 +872,11 @@ function renderEmojiPieChart(data) {
             maintainAspectRatio: false,
             plugins: {
                 title: {
-                    display: true,
+                    display:  true,
                     text: 'Top 5 Most Used Emojis',
                     font: {
-                        size: 18,
-                        weight: 'bold'
+                        size:  18,
+                        weight:  'bold'
                     },
                     padding: {
                         top: 10,
@@ -504,15 +894,15 @@ function renderEmojiPieChart(data) {
                         padding: 15,
                         usePointStyle: true,
                         pointStyle: 'circle',
-                        generateLabels: function(chart) {
+                        generateLabels:  function(chart) {
                             const data = chart.data;
-                            if (data.labels.length && data.datasets.length) {
+                            if (data.labels. length && data.datasets.length) {
                                 return data.labels.map((label, i) => {
                                     const value = data.datasets[0].data[i];
                                     const total = data.datasets[0].data.reduce((a, b) => a + b, 0);
                                     const percentage = ((value / total) * 100).toFixed(1);
                                     return {
-                                        text: `${label}: ${value} (${percentage}%)`,
+                                        text:  `${label}: ${value} (${percentage}%)`,
                                         fillStyle: data.datasets[0].backgroundColor[i],
                                         hidden: false,
                                         index: i
@@ -538,23 +928,23 @@ function renderEmojiPieChart(data) {
                         label: function(context) {
                             const label = context.label || '';
                             const value = context.parsed || 0;
-                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const total = context.dataset.data. reduce((a, b) => a + b, 0);
                             const percentage = ((value / total) * 100).toFixed(1);
                             return `${label}: ${value} times (${percentage}%)`;
                         }
                     }
                 }
             },
-            animation: {
-                animateRotate: true,
-                animateScale: true,
+            animation:  {
+                animateRotate:  true,
+                animateScale:  true,
                 duration: 1000,
                 easing: 'easeInOutQuart'
             }
         };
 
         EmojipieChart = new Chart(ctx, {
-            type: "pie",
+            type:  "pie",
             data: chartData,
             options: chartOptions
         });
@@ -577,7 +967,7 @@ function renderEmojiTable(data) {
 
         const emojiList = data.emoji_list || [];
 
-        if (!emojiList.length) {
+        if (! emojiList.length) {
             console.warn("No emoji table data available");
             return;
         }
@@ -585,7 +975,7 @@ function renderEmojiTable(data) {
         // Get container
         const container = document.getElementById("emoji-table-container");
         if (!container) {
-            console.error("Emoji table container not found");
+            console. error("Emoji table container not found");
             return;
         }
 
@@ -612,7 +1002,7 @@ function renderEmojiTable(data) {
         table.appendChild(thead);
 
         // Create table body
-        const tbody = document.createElement("tbody");
+        const tbody = document. createElement("tbody");
 
         emojiList.forEach((item, index) => {
             const tr = document.createElement("tr");
@@ -636,7 +1026,7 @@ function renderEmojiTable(data) {
             tr.appendChild(tdRank);
             tr.appendChild(tdEmoji);
             tr.appendChild(tdCount);
-            tbody.appendChild(tr);
+            tbody. appendChild(tr);
         });
 
         table.appendChild(tbody);
@@ -664,7 +1054,7 @@ function renderWordCloud(data) {
 
         const wordCloudData = data.word_cloud || [];
 
-        if (!wordCloudData.length) {
+        if (!wordCloudData. length) {
             console.warn("No word cloud data available");
             return;
         }
@@ -676,7 +1066,7 @@ function renderWordCloud(data) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         // Get max frequency for scaling
-        const maxFreq = Math.max(...wordCloudData.map(item => item[1]));
+        const maxFreq = Math.max(...wordCloudData. map(item => item[1]));
         const minFreq = Math.min(...wordCloudData.map(item => item[1]));
 
         // Color palette
@@ -727,7 +1117,7 @@ function renderWordCloud(data) {
             return placedRects.some(rect => 
                 x < rect.x + rect.width + margin &&
                 x + width + margin > rect.x &&
-                y < rect.y + rect.height + margin &&
+                y < rect.y + rect. height + margin &&
                 y + height + margin > rect.y
             );
         }
@@ -735,7 +1125,7 @@ function renderWordCloud(data) {
         // Place words
         words.forEach(word => {
             ctx.font = `bold ${word.fontSize}px Arial, sans-serif`;
-            const metrics = ctx.measureText(word.text);
+            const metrics = ctx.measureText(word. text);
             word.width = metrics.width;
             word.height = word.fontSize;
 
@@ -752,7 +1142,7 @@ function renderWordCloud(data) {
                 // Check bounds and collisions
                 if (x >= 0 && x + word.width <= canvas.width &&
                     y >= 0 && y + word.height <= canvas.height &&
-                    !checkCollision(x, y, word.width, word.height)) {
+                    ! checkCollision(x, y, word.width, word.height)) {
                     
                     word.x = x;
                     word.y = y;
@@ -779,7 +1169,7 @@ function renderWordCloud(data) {
         words.forEach(word => {
             if (word.placed) {
                 ctx.font = `bold ${word.fontSize}px Arial, sans-serif`;
-                ctx.fillStyle = word.color;
+                ctx.fillStyle = word. color;
                 ctx.textAlign = 'left';
                 ctx.textBaseline = 'top';
                 ctx.fillText(word.text, word.x, word.y);
@@ -807,10 +1197,10 @@ function renderLineChartM(data) {
 
         const ctx = canvas.getContext("2d");
         // Separate months and counts
-        const months = data.time_m || [];
+        const months = data. time_m || [];
         const counts = data.message_count_m || [];
 
-        if (!months) {
+        if (!months.length) {
             console.warn("No monthly timeline data available");
             return;
         }
@@ -823,8 +1213,6 @@ function renderLineChartM(data) {
 
         // Destroy previous chart instance
         timelineChartM = destroyChart(timelineChartM);
-
-
 
         const chartData = {
             labels: months,
@@ -851,7 +1239,7 @@ function renderLineChartM(data) {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                title: {
+                title:  {
                     display: true,
                     text: 'Message Activity Over Time',
                     font: {
@@ -866,13 +1254,192 @@ function renderLineChartM(data) {
                 },
                 legend: {
                     display: true,
-                    position: 'top',
+                    position:  'top',
                     labels: {
                         font: {
                             size: 14,
                             weight: '600'
                         },
                         padding: 20,
+                        usePointStyle: true
+                    }
+                },
+                tooltip: {
+                    backgroundColor:  'rgba(0, 0, 0, 0.8)',
+                    padding: 12,
+                    titleFont: {
+                        size: 14,
+                        weight: 'bold'
+                    },
+                    bodyFont: {
+                        size: 13
+                    },
+                    cornerRadius: 8,
+                    callbacks: {
+                        label: function(context) {
+                            const value = context.parsed. y;
+                            return `Messages: ${value.toLocaleString()}`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        font: {
+                            size: 12
+                        },
+                        padding: 8,
+                        callback: function(value) {
+                            return value.toLocaleString();
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)',
+                        drawBorder: false
+                    },
+                    title: {
+                        display: true,
+                        text: 'Number of Messages',
+                        font:  {
+                            size: 13,
+                            weight: '600'
+                        },
+                        padding: {
+                            top: 10,
+                            bottom: 0
+                        }
+                    }
+                },
+                x: {
+                    ticks: {
+                        font:  {
+                            size: 11,
+                            weight: '500'
+                        },
+                        padding: 8,
+                        maxRotation: 45,
+                        minRotation:  45
+                    },
+                    grid:  {
+                        display: false
+                    },
+                    title:  {
+                        display: true,
+                        text: 'Month',
+                        font: {
+                            size: 13,
+                            weight: '600'
+                        },
+                        padding:  {
+                            top: 10,
+                            bottom: 0
+                        }
+                    }
+                }
+            },
+            animation: {
+                duration: 1000,
+                easing: 'easeInOutQuart'
+            },
+            interaction: {
+                intersect: false,
+                mode:  'index'
+            }
+        };
+
+        timelineChartM = new Chart(ctx, {
+            type:  "line",
+            data: chartData,
+            options: chartOptions
+        });
+
+        console.log("✅ Timeline chart rendered successfully");
+
+    } catch (err) {
+        console.error("❌ Timeline Chart Error:", err);
+    }
+}
+
+/**
+ * Renders a line chart showing message count per day
+ * @param {Object} data - Contains time_d and message_count_d arrays
+ */
+function renderLineChartD(data) {
+    try {
+        const canvas = document.getElementById("timelineChartD");
+        if (!canvas) {
+            console.error("Timeline chart canvas not found");
+            return;
+        }
+
+        const ctx = canvas. getContext("2d");
+        // Separate days and counts
+        const days = data.time_d || [];
+        const counts = data.message_count_d || [];
+
+        if (!days.length) {
+            console.warn("No daily timeline data available");
+            return;
+        }
+
+        // Show timeline chart container
+        const timelineDContainer = document.getElementById("timelineChartDContainer");
+        if (timelineDContainer) {
+            timelineDContainer.style. display = "block";
+        }
+
+        // Destroy previous chart instance
+        timelineChartD = destroyChart(timelineChartD);
+
+        const chartData = {
+            labels: days,
+            datasets: [{
+                label:  'Messages per Day',
+                data: counts,
+                borderColor: 'rgb(33, 69, 233)',
+                backgroundColor: 'rgba(20, 50, 184, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension:  0.4,
+                pointRadius: 5,
+                pointBackgroundColor: 'rgb(25, 54, 181)',
+                pointBorderColor:  '#dad6d6',
+                pointBorderWidth: 2,
+                pointHoverRadius: 7,
+                pointHoverBackgroundColor:  'rgb(47, 76, 206)',
+                pointHoverBorderColor: '#fff',
+                pointHoverBorderWidth: 3
+            }]
+        };
+
+        const chartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins:  {
+                title: {
+                    display: true,
+                    text: 'Daily Message Activity',
+                    font:  {
+                        size: 20,
+                        weight: 'bold'
+                    },
+                    padding: {
+                        top: 10,
+                        bottom: 30
+                    },
+                    color: '#2c3e50'
+                },
+                legend: {
+                    display:  true,
+                    position: 'top',
+                    labels:  {
+                        font: {
+                            size: 14,
+                            weight: '600'
+                        },
+                        padding:  20,
                         usePointStyle: true
                     }
                 },
@@ -897,8 +1464,8 @@ function renderLineChartM(data) {
             },
             scales: {
                 y: {
-                    beginAtZero: true,
-                    ticks: {
+                    beginAtZero:  true,
+                    ticks:  {
                         font: {
                             size: 12
                         },
@@ -927,24 +1494,24 @@ function renderLineChartM(data) {
                 x: {
                     ticks: {
                         font: {
-                            size: 11,
-                            weight: '500'
+                            size:  11,
+                            weight:  '500'
                         },
                         padding: 8,
                         maxRotation: 45,
-                        minRotation: 45
+                        minRotation:  45
                     },
                     grid: {
                         display: false
                     },
                     title: {
                         display: true,
-                        text: 'Month',
+                        text:  'Date',
                         font: {
                             size: 13,
                             weight: '600'
                         },
-                        padding: {
+                        padding:  {
                             top: 10,
                             bottom: 0
                         }
@@ -953,76 +1520,75 @@ function renderLineChartM(data) {
             },
             animation: {
                 duration: 1000,
-                easing: 'easeInOutQuart'
+                easing:  'easeInOutQuart'
             },
-            interaction: {
+            interaction:  {
                 intersect: false,
                 mode: 'index'
             }
         };
 
-        timelineChartM = new Chart(ctx, {
-            type: "line",
+        timelineChartD = new Chart(ctx, {
+            type:  "line",
             data: chartData,
             options: chartOptions
         });
 
-        console.log("✅ Timeline chart rendered successfully");
+        console.log("✅ Daily timeline chart rendered successfully");
 
     } catch (err) {
-        console.error("❌ Timeline Chart Error:", err);
+        console.error("❌ Daily Timeline Chart Error:", err);
     }
 }
+
 /**
- * Renders a line chart showing message count per month
- * @param {Object} data - Contains monthly_timeline [[month, count], ...]
+ * Renders a line chart showing message count per hour (Peak Hours)
+ * @param {Object} data - Contains time_h and message_count_h arrays
  */
-function renderLineChartD(data) {
+function renderLineChartH(data) {
     try {
-        const canvas = document.getElementById("timelineChartD");
+        const canvas = document.getElementById("timelineChartH");
         if (!canvas) {
             console.error("Timeline chart canvas not found");
             return;
         }
 
-        const ctx = canvas.getContext("2d");
-        // Separate months and counts
-        const months = data.time_d || [];
-        const counts = data.message_count_d|| [];
+        const ctx = canvas. getContext("2d");
+        // Separate hours and counts
+        const hours = data.time_h || [];
+        const counts = data.message_count_h || [];
 
-        if (!months) {
-            console.warn("No monthly timeline data available");
+        if (!hours.length) {
+            console.warn("No hourly timeline data available");
             return;
         }
 
         // Show timeline chart container
-        const timelineDContainer = document.getElementById("timelineChartDContainer");
-        if (timelineDContainer) {
-            timelineDContainer.style.display = "block";
+        const timelineHContainer = document.getElementById("timelineChartHContainer");
+        if (timelineHContainer) {
+            timelineHContainer. style.display = "block";
         }
 
         // Destroy previous chart instance
-        timelineChartD = destroyChart(timelineChartD);
-
-
+        timelineChartH = destroyChart(timelineChartH);
 
         const chartData = {
-            labels: months,
+            labels: hours,
             datasets: [{
-                label: 'Messages per Day',
+                label: 'Peak Hours',
                 data: counts,
                 borderColor: 'rgb(33, 69, 233)',
                 backgroundColor: 'rgba(20, 50, 184, 0.1)',
                 borderWidth: 3,
                 fill: true,
-                tension: 0.4,
+                tension:  0.4,
                 pointRadius: 5,
                 pointBackgroundColor: 'rgb(25, 54, 181)',
                 pointBorderColor: '#dad6d6',
                 pointBorderWidth: 2,
                 pointHoverRadius: 7,
                 pointHoverBackgroundColor: 'rgb(47, 76, 206)',
-                pointHoverBorderColor: '#fdad6d6ff',
+                pointHoverBorderColor: '#fff',
                 pointHoverBorderWidth: 3
             }]
         };
@@ -1033,7 +1599,7 @@ function renderLineChartD(data) {
             plugins: {
                 title: {
                     display: true,
-                    text: 'Message Activity Over Time',
+                    text: 'Peak Hours Activity',
                     font: {
                         size: 20,
                         weight: 'bold'
@@ -1044,7 +1610,7 @@ function renderLineChartD(data) {
                     },
                     color: '#2c3e50'
                 },
-                legend: {
+                legend:  {
                     display: true,
                     position: 'top',
                     labels: {
@@ -1053,7 +1619,7 @@ function renderLineChartD(data) {
                             weight: '600'
                         },
                         padding: 20,
-                        usePointStyle: true
+                        usePointStyle:  true
                     }
                 },
                 tooltip: {
@@ -1079,7 +1645,7 @@ function renderLineChartD(data) {
                 y: {
                     beginAtZero: true,
                     ticks: {
-                        font: {
+                        font:  {
                             size: 12
                         },
                         padding: 8,
@@ -1098,7 +1664,7 @@ function renderLineChartD(data) {
                             size: 13,
                             weight: '600'
                         },
-                        padding: {
+                        padding:  {
                             top: 10,
                             bottom: 0
                         }
@@ -1111,7 +1677,7 @@ function renderLineChartD(data) {
                             weight: '500'
                         },
                         padding: 8,
-                        maxRotation: 45,
+                        maxRotation:  45,
                         minRotation: 45
                     },
                     grid: {
@@ -1119,7 +1685,7 @@ function renderLineChartD(data) {
                     },
                     title: {
                         display: true,
-                        text: 'Month',
+                        text: 'Hour of Day',
                         font: {
                             size: 13,
                             weight: '600'
@@ -1132,7 +1698,7 @@ function renderLineChartD(data) {
                 }
             },
             animation: {
-                duration: 1000,
+                duration:  1000,
                 easing: 'easeInOutQuart'
             },
             interaction: {
@@ -1141,19 +1707,269 @@ function renderLineChartD(data) {
             }
         };
 
-        timelineChartD = new Chart(ctx, {
+        // ✅ FIXED: Now correctly assigns to timelineChartH
+        timelineChartH = new Chart(ctx, {
             type: "line",
             data: chartData,
             options: chartOptions
         });
 
-        console.log("✅ Timeline chart rendered successfully");
+        console.log("✅ Hourly timeline chart rendered successfully");
 
     } catch (err) {
-        console.error("❌ Timeline Chart Error:", err);
+        console.error("❌ Hourly Timeline Chart Error:", err);
     }
 }
+/* ===================== HEATMAP - Day/Period ===================== */
+let heatmapChart = null;
 
+/**
+ * Renders a heatmap showing message activity by day of week and time period
+ * @param {Object} data - Contains heatmap_data with days, periods, and values
+ */
+/* ===================== HEATMAP - Day/Period ===================== */
+
+function renderHeatmap(data) {
+    try {
+        const canvas = document.getElementById("heatmapChart");
+        if (!canvas) {
+            console.error("Heatmap canvas not found");
+            return;
+        }
+
+        const ctx = canvas.getContext("2d");
+
+        // Extract pivot table data
+        const days = data.heatmap_days || [];
+        const periods = data.heatmap_periods || [];
+        const values = data.heatmap_values || [];
+
+        if (!days.length || !periods.length || !values.length) {
+            console.warn("No heatmap data available");
+            return;
+        }
+
+        // Show heatmap container
+        const heatmapContainer = document.getElementById("heatmapChartContainer");
+        if (heatmapContainer) {
+            heatmapContainer.style.display = "block";
+        }
+
+        // Destroy previous chart instance
+        heatmapChart = destroyChart(heatmapChart);
+
+        // Prepare data for Chart.js matrix
+        const dataPoints = [];
+        for (let i = 0; i < days.length; i++) {
+            for (let j = 0; j < periods.length; j++) {
+                dataPoints.push({
+                    x: periods[j],
+                    y: days[i],
+                    v: values[i][j]
+                });
+            }
+        }
+
+        // Find min and max for color scaling
+        const allValues = values.flat();
+        const maxValue = Math.max(...allValues);
+        const minValue = Math.min(...allValues);
+        const totalMessages = allValues.reduce((a, b) => a + b, 0);
+
+        // ✅ Find peak time (day + period combination)
+        let peakValue = 0;
+        let peakDay = '';
+        let peakPeriod = '';
+        
+        for (let i = 0; i < days.length; i++) {
+            for (let j = 0; j < periods.length; j++) {
+                if (values[i][j] > peakValue) {
+                    peakValue = values[i][j];
+                    peakDay = days[i];
+                    peakPeriod = periods[j];
+                }
+            }
+        }
+
+        // ✅ Find most active day (sum across all periods)
+        let maxDayTotal = 0;
+        let mostActiveDay = '';
+        
+        for (let i = 0; i < days.length; i++) {
+            const dayTotal = values[i].reduce((a, b) => a + b, 0);
+            if (dayTotal > maxDayTotal) {
+                maxDayTotal = dayTotal;
+                mostActiveDay = days[i];
+            }
+        }
+
+        const chartData = {
+            datasets: [{
+                label: 'Messages',
+                data: dataPoints,
+                backgroundColor: function(context) {
+                    const value = context.dataset.data[context.dataIndex].v;
+                    const normalized = (value - minValue) / (maxValue - minValue || 1);
+                    
+                    // Color scale from blue (low) to red (high)
+                    if (normalized < 0.25) {
+                        return `rgba(54, 162, 235, ${0.3 + normalized * 2})`;
+                    } else if (normalized < 0.5) {
+                        return `rgba(75, 192, 192, ${0.4 + normalized * 1.5})`;
+                    } else if (normalized < 0.75) {
+                        return `rgba(255, 205, 86, ${0.5 + normalized * 1.2})`;
+                    } else {
+                        return `rgba(255, 99, 132, ${0.6 + normalized})`;
+                    }
+                },
+                borderColor: 'rgba(255, 255, 255, 0.8)',
+                borderWidth: 2,
+                width: ({chart}) => (chart.chartArea || {}).width / periods.length - 2,
+                height: ({chart}) => (chart.chartArea || {}).height / days.length - 2
+            }]
+        };
+
+        const chartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Message Activity Heatmap - Day vs Time Period',
+                    font: {
+                        size: 20,
+                        weight: 'bold'
+                    },
+                    padding: {
+                        top: 10,
+                        bottom: 30
+                    },
+                    color: '#ffffff'
+                },
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    padding: 12,
+                    titleFont: {
+                        size: 14,
+                        weight: 'bold'
+                    },
+                    bodyFont: {
+                        size: 13
+                    },
+                    cornerRadius: 8,
+                    callbacks: {
+                        title: function(context) {
+                            const point = context[0].raw;
+                            return `${point.y} - ${point.x}`;
+                        },
+                        label: function(context) {
+                            const value = context.raw.v;
+                            return `Messages: ${value.toLocaleString()}`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    type: 'category',
+                    labels: periods,
+                    offset: true,
+                    ticks: {
+                        font: {
+                            size: 12,
+                            weight: '500'
+                        },
+                        padding: 8,
+                        color: '#a0aec0'
+                    },
+                    grid: {
+                        display: false
+                    },
+                    title: {
+                        display: true,
+                        text: 'Time Period',
+                        font: {
+                            size: 14,
+                            weight: '600'
+                        },
+                        padding: {
+                            top: 10,
+                            bottom: 0
+                        },
+                        color: '#ffffff'
+                    }
+                },
+                y: {
+                    type: 'category',
+                    labels: days,
+                    offset: true,
+                    ticks: {
+                        font: {
+                            size: 12,
+                            weight: '500'
+                        },
+                        padding: 8,
+                        color: '#a0aec0'
+                    },
+                    grid: {
+                        display: false
+                    },
+                    title: {
+                        display: true,
+                        text: 'Day of Week',
+                        font: {
+                            size: 14,
+                            weight: '600'
+                        },
+                        padding: {
+                            top: 0,
+                            bottom: 10
+                        },
+                        color: '#ffffff'
+                    }
+                }
+            },
+            animation: {
+                duration: 800,
+                easing: 'easeInOutQuart'
+            }
+        };
+
+        heatmapChart = new Chart(ctx, {
+            type: 'matrix',
+            data: chartData,
+            options: chartOptions
+        });
+
+        // ✅ UPDATE INFO ITEMS
+        const peakElement = document.getElementById('heatmap-peak');
+        const totalElement = document.getElementById('heatmap-total');
+        const activeDayElement = document.getElementById('heatmap-active-day');
+
+        if (peakElement) {
+            peakElement.textContent = `${peakDay} - ${peakPeriod}`;
+        }
+
+        if (totalElement) {
+            totalElement.textContent = totalMessages.toLocaleString();
+        }
+
+        if (activeDayElement) {
+            activeDayElement.textContent = `${mostActiveDay} (${maxDayTotal.toLocaleString()})`;
+        }
+
+        console.log("✅ Heatmap rendered successfully");
+        console.log(`📊 Peak: ${peakDay} - ${peakPeriod} (${peakValue} messages)`);
+        console.log(`📊 Most Active Day: ${mostActiveDay} (${maxDayTotal} messages)`);
+        console.log(`📊 Total Messages: ${totalMessages}`);
+
+    } catch (err) {
+        console.error("❌ Heatmap Error:", err);
+    }
+}
 /* ===================== UTILITY FUNCTIONS ===================== */
 /**
  * Renders all visualizations at once
@@ -1166,12 +1982,16 @@ function renderAllVisualizations(data) {
     }
 
     renderBarChart(data);
+    renderDayBarChart(data);      // NEW: Day of week bar chart
+    renderMonthBarChart(data);    // NEW: Month bar chart
     renderPieChart(data);
     renderTable(data);
     renderEmojiPieChart(data);
     renderEmojiTable(data);
-    renderLineChartM(data)
-    renderLineChartD(data)
+    renderLineChartM(data);
+    renderLineChartD(data);
+    renderLineChartH(data);
+    renderHeatmap(data);
 }
 
 /**
@@ -1181,8 +2001,12 @@ function clearAllVisualizations() {
     analysisChart = destroyChart(analysisChart);
     pieChart = destroyChart(pieChart);
     EmojipieChart = destroyChart(EmojipieChart);
-    timelineChartM=destroyChart(timelineChartM);
-    timelineChartD=destroyChart(timelineChartD);
+    timelineChartM = destroyChart(timelineChartM);
+    timelineChartD = destroyChart(timelineChartD);
+    timelineChartH = destroyChart(timelineChartH);
+    dayBarChart = destroyChart(dayBarChart);      // NEW
+    monthBarChart = destroyChart(monthBarChart);
+    heatmapChart=destroyChart(heatmapChart);  // NEW
     destroyTable();
     destroyEmojiTable();
     
@@ -1195,13 +2019,35 @@ function clearAllVisualizations() {
     if (EmojipieContainer) {
         EmojipieContainer.style.display = "none";
     }
-        const timelineMContainer = document.getElementById("timelineChartMContainer");
+
+    const timelineMContainer = document.getElementById("timelineChartMContainer");
     if (timelineMContainer) {
-        timelineMContainer.style.display = "none";
+        timelineMContainer.style. display = "none";
+    }
+
     const timelineDContainer = document.getElementById("timelineChartDContainer");
     if (timelineDContainer) {
         timelineDContainer.style.display = "none";
     }
+
+    const timelineHContainer = document.getElementById("timelineChartHContainer");
+    if (timelineHContainer) {
+        timelineHContainer.style.display = "none";
+    }
+
+    // NEW: Hide day and month bar chart containers
+    const dayBarContainer = document.getElementById("dayBarChartContainer");
+    if (dayBarContainer) {
+        dayBarContainer.style.display = "none";
+    }
+
+    const monthBarContainer = document.getElementById("monthBarChartContainer");
+    if (monthBarContainer) {
+        monthBarContainer.style.display = "none";
+    }
+            const heatmapContainer = document.getElementById("heatmapChartContainer");
+        if (heatmapContainer) {
+            heatmapContainer.style.display = "none";
+        }
     console.log("✅ All visualizations cleared");
-}
 }

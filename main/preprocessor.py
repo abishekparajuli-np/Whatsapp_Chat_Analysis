@@ -29,12 +29,13 @@ def preprocess(text):
     msg_df['Month']=msg_df['Date'].dt.month_name()
     msg_df['Month_Num']=msg_df['Date'].dt.month
     msg_df['Day']=msg_df['Date'].dt.day
-    msg_df['Day_Name']=msg_df['Date'].dt.day_name()
+    msg_df['Day_Week']=msg_df['Date'].dt.day_name()
+    msg_df['Week_Num']=msg_df['Date'].dt.weekday
     msg_df['Hour']=msg_df['Date'].dt.hour
     msg_df['Minute']=msg_df['Date'].dt.minute
 
     period = []
-    for hour in msg_df[['Day_Name', 'Hour']]['Hour']:
+    for hour in msg_df[['Day_Week', 'Hour']]['Hour']:
         if hour == 23:
             period.append(str(hour) + "-" + str('00'))
         elif hour == 0:
