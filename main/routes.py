@@ -68,7 +68,7 @@ def fetch():
         message_share = []
 
     # Fetch stats for the selected user
-    num_messages, num_words, num_medias, num_links,word_cloud,emoji_list,time_m,message_count_m,time_d,message_count_d= fetch_stats(selected_user, df)
+    num_messages, num_words, num_medias, num_links,word_cloud,emoji_list,time_m,message_count_m,time_d,message_count_d,time_h,message_count_h= fetch_stats(selected_user, df)
 
     # Prepare the results to send to the frontend
     results = {
@@ -82,8 +82,9 @@ def fetch():
         'emoji_list':emoji_list,
         'time_m':time_m,
         'time_d':time_d,
+        'time_h':time_h,
         'message_count_m':message_count_m,
-        'message_count_d':message_count_d
+        'message_count_d':message_count_d,
+        'message_count_h':message_count_h
     }
-
     return jsonify({'results': results})

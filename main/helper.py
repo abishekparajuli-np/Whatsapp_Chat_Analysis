@@ -18,8 +18,8 @@ def fetch_stats(selected_user,df):
     n_links=num_links(df)
     word_list=word_cloud_words(df)
     emoji_list=most_frequent_emoji(df)
-    time_m,message_count_m,time_d,message_count_d=timeline_data(df)
-    return num_messages,n_words,n_medias,n_links,word_list,emoji_list,time_m,message_count_m,time_d,message_count_d
+    time_m,message_count_m,time_d,message_count_d,time_h,message_count_h=timeline_data(df)
+    return num_messages,n_words,n_medias,n_links,word_list,emoji_list,time_m,message_count_m,time_d,message_count_d,time_h,message_count_h
 
 
 
@@ -120,6 +120,10 @@ def timeline_data(msg_df):
     tm2 = msg_df.groupby(msg_df['Date'].dt.date).count()['Message'].reset_index()
     tm2 = tm2.sort_values(by='Date')
     
+    #Hourly timeline
+    tm3=msg_df.groupby(msg_df['Date'].dt.hour).count()['Message'].reset_index()
+    tm3=tm3.sort_value(by='Date')
+
     # Format monthly labels (e.g., "Jan-2024")
     time_monthly = []
     for i in range(timeline.shape[0]):
@@ -127,9 +131,11 @@ def timeline_data(msg_df):
     
     # Format daily labels (e.g., "2024-01-15")
     time_daily = [str(date) for date in tm2['Date'].tolist()]
+    time_hourly= [str(date) for date in tm3['Date'].tolist()]
     
     # Get message counts
     message_count_monthly = timeline['Message'].tolist()
     message_count_daily = tm2['Message'].tolist()
+    message_count_hourly = tm3['Message'].tolist()
     
-    return time_monthly, message_count_monthly, time_daily, message_count_daily
+    return time_monthly, message_count_monthly, time_daily, message_count_daily,time_hourly,message_count_hourly
